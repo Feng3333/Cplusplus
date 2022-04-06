@@ -19,8 +19,6 @@ upper_bound( begin,end,num,greater<type>() ):从数组的begin位置到end-1位�
 
 例：
     
-class Solution {
-public:
     int findTheDistanceValue(vector<int>& arr1, vector<int>& arr2, int d) {
     
         sort(arr2.begin(), arr2.end());
@@ -44,4 +42,3 @@ public:
         }
         return cnt;
     }
-};

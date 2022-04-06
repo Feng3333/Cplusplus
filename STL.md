@@ -18,6 +18,7 @@ upper_bound( begin,end,num,greater<type>() ):从数组的begin位置到end-1位�
 通过返回的地址减去起始地址begin,得到找到数字在数组中的下标。
 
 例：
+    
 class Solution {
 public:
     int findTheDistanceValue(vector<int>& arr1, vector<int>& arr2, int d) {

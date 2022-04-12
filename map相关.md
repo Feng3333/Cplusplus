@@ -1,8 +1,9 @@
 ## map和unordered_map的差别
     
 ### 1. 需要引入的头文件不同
-map: #include < map >
-unordered_map: #include < unordered_map >
+map:   #include < map >
+
+unordered_map:   #include < unordered_map >
 
 ### 2. 底层实现的数据结构不同
 
@@ -13,11 +14,13 @@ unordered_map是基于哈希表（也叫散列表）实现的。散列表是根�
 ### 3. 元素排列顺序不同
     
 map：基于红黑树，元素有序存储；
+
 unordered_map：基于散列表，元素无序存储；
     
 ### 4. 插入和查询的时间复杂度不同
 
 map：基于红黑树，复杂度与树高相同，即O(logn)；
+
 unordered_map：基于散列表，复杂度依赖于散列函数产生的冲突多少，但大多数情况下其复杂度接近于O(1)。
     
 ### 5. 效率及其稳定性不同

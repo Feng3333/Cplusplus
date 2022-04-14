@@ -128,3 +128,71 @@ int maxValue = *max_element(a,a+2); //最大值
 
 int minValue = *min_element(a,a+2);//最小值
 ```
+
+
+##  accumulate的用法
+
+###  1.累加求和
+
+举例：
+```c++
+//vec为某个数组，num为初始的累加值
+int sum = accumulate(vec.begin() , vec.end() , num); 
+```
+
+另外 ：可以使用accumulate把string型的vector容器中的元素连接起来：
+```c+
+string sum = accumulate(v.begin() , v.end() , string(" "));
+//这个函数调用的效果是：从空字符串开始，把vec里的每个元素连接成一个字符串
+```
+
+### 2.自定义的数据类型的处理
+
+C++ STL中有一个通用的数值类型计算函数— accumulate(),可以用来直接计算数组或者容器中C++内置数据类型，例如:
+```c++
+#include <numeric> //调用aaccumulate()所需的头文件
+
+int arr[]={10,20,30,40,50};
+vector<int> va(&arr[0],&arr[5]);
+int sum=accumulate(va.begin(),va.end(),0); //sum = 150
+```
+
+但是对于自定义数据类型，我们就需要自己动手写一个回调函数来实现自定义数据的处理，然后让它作为accumulate()的第四个参数，accumulate()的原型为:
+```c++
+template<class _InIt,
+class _Ty,
+class _Fn2> inline
+_Ty _Accumulate(_InIt _First, _InIt _Last, _Ty _Val, _Fn2 _Func)
+{    /利用_Func来计算_First和_Last之间的和, 
+for (; _First != _Last; ++_First)
+_Val = _Func(_Val, *_First);
+return (_Val);
+}
+```
+
+具体举例说明：
+```c++
+#include <vector>
+#include <string>
+
+using namespace std;
+
+struct Grade {
+    string name;
+    int grade;
+};
+
+int main() {
+    Grade subject[3] = {
+        { "English", 80 },
+        { "Biology", 70 },
+        { "History", 90 }
+    };
+
+    int sum = accumulate(subject, subject + 3, 0, [](int a, Grade b){return a + b.grade; });
+    cout << sum << endl;
+
+    system("pause");
+    return 0;
+}
+```

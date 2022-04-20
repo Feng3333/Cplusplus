@@ -204,3 +204,63 @@ int main() {
     int a,b;
     int ans = __gcd(a,b);
 ```
+
+## find( )
+
+find() 函数本质上是一个模板函数，用于在指定范围内查找和目标元素值相等的第一个元素。
+
+find() 函数的语法格式：
+InputIterator find (InputIterator first, InputIterator last, const T& val);
+其中，first 和 last 为输入迭代器，[first, last) 用于指定该函数的查找范围；val 为要查找的目标元素。
+正因为 first 和 last 的类型为输入迭代器，因此该函数适用于所有的序列式容器。
+
+#### 1、find()用于普通数组
+```c++
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    int arr[] = {1,2,3,4,5,6};
+    int len = 6;
+    
+    if ( find(arr,arr+len,2) != arr+len ) cout << "查询成功" << endl;
+    else  cout << "查询失败" << endl;
+    
+    return 0;
+}
+```
+
+#### 2、find()用于容器
+```c++
+#include <iostream>
+#include <algorithm>
+#include <vector>
+using namespace std;
+
+int main() {
+    vector<int> arr = {1,2,3,4,5,6};
+    int len = 6;
+    
+    if ( find(arr.begin(),arr.end(),2) != arr.end() ) cout << "查询成功" << endl;
+    else  cout << "查询失败" << endl;
+    
+    return 0;
+}
+```
+
+#### 3、find()用于字符串
+```c++
+#include <iostream> 
+#include <cstring>
+using namespace std;
+
+int main() {
+    string s = "Hello World";
+    
+    if (s.find("o") != string::npos ) cout << "查询成功" << endl;
+    else cout << "查询失败" << endl;
+    
+    return 0;
+}
+```

@@ -264,3 +264,42 @@ int main() {
     return 0;
 }
 ```
+
+
+## iota()
+
+iota函数可以对一个范围数据进行赋值：
+```c++
+//iota()内部实现原理
+template <class ForwardIterator, class T>
+  void iota (ForwardIterator first, ForwardIterator last, T val)
+{
+  while (first!=last) {
+    *first = val;
+    ++first;
+    ++val;
+  }
+}
+```
+
+具体用法:
+```c++
+// iota example
+#include <iostream>     // std::cout
+#include <numeric>      // std::iota
+#include <vector>      
+int main () {
+  int numbers[10];
+  vector<int> nums(100);
+  
+  std::iota (numbers,numbers+10,100);
+  std::iota (nums.begin(),nums.end(),0); //其中0为初始值num[0]的数值
+  
+  std::cout << "numbers:";
+  for (int& i:numbers) std::cout << ' ' << i;
+  //这里打印出来的数组为:numbers:100 101 102 103 104 105 106 107 108 109 
+  std::cout << '\n';
+  return 0;
+}
+
+```

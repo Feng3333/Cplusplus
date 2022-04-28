@@ -358,7 +358,7 @@ bound =5
 相较于partition()的只负责对指定区域内的数据进行分组（不保证各组中元素的相对位置不发生改变）;    
 stable_partition() 函数可以保证对指定区域内数据完成分组的同时，不改变各组内元素的相对位置。   
 
-还是以上面的所创建的myvector为例:
+还是以上面所创建的myvector为例:
 ```c++
     bound = std::stable_partition(myvector.begin(),myvector.end(),[](const & a){
         return a%2 == 0;

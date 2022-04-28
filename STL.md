@@ -301,5 +301,71 @@ int main () {
   std::cout << '\n';
   return 0;
 }
-
 ```
+
+
+## partition()与stable_partition()
+
+### partition()
+partition算法作用为对指定范围内元素重新排序，使用输入的函数，把结果为true的元素放在结果为false的元素之前  
+一般用法:
+```c++
+partition(vector<int>::iterator.first,vector<int>::iterator.last,cmp)
+/*first 和 last 为正向迭代器，其组合 [first, last) 用于指定该函数的作用范围；cmp用于指定筛选规则。
+（筛选规则，其本质就是一个可接收 1 个参数且返回值类型为 bool 的函数，可以是普通函数，也可以是一个函数对象。）
+同时，partition() 函数还会返回一个正向迭代器，其指向的是两部分数据的分界位置，更确切地说，指向的是第二组数据中的第 1 个元素。*/
+```
+示例：
+```c++
+#include <iostream>     
+#include <algorithm>   
+#include <vector>       
+using namespace std;
+
+//以普通函数的方式定义partition()函数的筛选规则
+bool cmp(int i) { return (i % 2) == 0; }
+
+//以函数对象的形式定义筛选规则
+class cmp2{
+public:
+    bool operator()(const int& i) {
+        return (i%2 == 0);
+    }
+};
+
+int main() {
+    vector<int> myvector(9);
+    //对myvector中的值依次进行赋值
+    std::iota (myvector.begin(), myvector.end(),1);
+    
+    vector<int>::iterator bound;
+    //以 mycomp2 规则，对 myvector 容器中的数据进行分组
+    bound = std::partition(myvector.begin(), myvector.end(), cmp2());
+    for (vector<int>::iterator it = myvector.begin(); it != myvector.end(); ++it) {
+        cout << *it << " ";
+    }
+    cout << "\nbound = " << *bound;
+    return 0;
+}
+```
+运行结果：  
+8 2 6 4 5 3 7 1 9  
+bound =5
+
+### stable_partition()函数
+相较于partition()的只负责对指定区域内的数据进行分组（不保证各组中元素的相对位置不发生改变）;    
+stable_partition() 函数可以保证对指定区域内数据完成分组的同时，不改变各组内元素的相对位置。   
+
+还是以上面的所创建的myvector为例:
+```c++
+    bound = std::stable_partition(myvector.begin(),myvector.end(),[](const & a){
+        return a%2 == 0;
+    });
+    for (auto num : myvector) cout << num << endl;
+    cout << "\nbound = " << *bound;
+```
+此时的运行结果就是有明显的顺序感：  
+2 4 6 8 1 3 5 7 9  
+bound = 1
+
+

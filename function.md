@@ -98,3 +98,6 @@ int main(...) {
 ...
 This is A Object  
 ```
+
+## function的实现原理
+https://zhuanlan.zhihu.com/p/161356621

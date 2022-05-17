@@ -175,4 +175,12 @@ int main(){
     return 0;
 }
 ```
+运行结果：
+```
+emplace_back: 
+调用构造函数
+push_back: 
+调用构造函数
+调用拷贝构造函数
+```
 

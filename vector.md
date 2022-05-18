@@ -24,7 +24,7 @@ vector会先分配一个比需求更大的空间作为预留，
 
 这里涉及到vector的几个属性：  
 size():表示当前vector中已有的元素数量；  
-capacity():表示vector的实际总容量，即预留空间大小
+capacity():表示vector的实际总容量，即预留空间大小  
 reserver():表示要求vector的容量是多少，如果大于capacity则vector需要扩容  
 
 举个例子：  

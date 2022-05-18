@@ -3,7 +3,8 @@
 ## 目录
 - [1. 实现原理](#1-实现原理)  
   - [1.1 新增元素](#11-新增元素)
-  - [2.2 删除元素](#22-删除元素)
+  - [1.2 删除元素](#12-删除元素)
+  - [1.3 遍历其中的元素](#13-遍历其中的元素)
 - [2. push_back和emplace_back的区别](#2-push_back和emplace_back的区别)
 
 
@@ -128,7 +129,141 @@ int main() {
 0 0 0 0 1 2 3 100 4 5 6 7 8 9 10 11 
 ```
 
-### 2.2 删除元素
+### 1.2 删除元素
+
+删除元素和新增差不多，可以使用pop_back删除最后一个元素或者通过迭代器删除任一元素；  
+通过迭代器删除还是要先找到要删除元素的位置，即int index = iter - begin(), 而这个位置后面的每个元素都要向前移动一个元素的位置；  
+
+举个例子：
+```c++
+#include <iostream>
+#include <vector>
+#include <numeric>
+#include <algorithm>
+
+using namespace std;
+
+int main() {
+    vector<int> nums(10);
+    iota(nums.begin(),nums.end(),5); //nums初始化
+    cout << "nums初始化:" << endl;
+    for (auto num:nums) cout << num << " ";
+    cout << endl;
+    
+    //使用pop_back方法：
+    nums.pop_back();
+    cout << "使用pop_back方法：" << endl;
+    for (auto num:nums) cout << num << " ";
+    cout << endl;
+    
+    //通过迭代器删除某个元素：
+    vector<int>::iterator it = find(nums.begin(),nums.end(),9);
+    cout << "删除数字9: " << endl;
+    nums.erase(it);
+    for (auto num:nums) cout << num << " ";
+    cout << endl;
+    
+    return 0;
+}
+```
+运行结果：  
+![image](https://github.com/Feng3333/Cplusplus/blob/c9c514e5a8df8e6181ae8b0bcc82d4344ec5d4dd/images-folder/vector-delete1.png)
+
+#### 清空vector  
+清空vector中的所有元素：  
+```
+vector.clear();
+```
+需要注意的点：
+clear时删除了vector中的所有元素，但vector的空间仍是存在的，即vector的size变成了0，但是capacity没有变化；  
+由于vector是占用连续的内存空间的，所以如果vector占用的内存空间过大，并且使用了clear之后没有及时处理，会出现内存一直被占用的情况；  
+处理方法：  
+①每次clear之后重新初始化vector的capacity；  
+②可以使用swap方法：  
+```
+vector<int> (nums).swap(nums);
+```
+③使用shrink_to_fit:  
+使用shrink_to_fit可以减少容器的容量并且适应起大小，对于超出容器容量的部分会进行销毁
+```c++
+#include <iostream>
+#include <vector>
+#include <numeric>
+
+using namespace std;
+
+int main() {
+    vector<int> nums(100,11);
+    for (auto num:nums) cout << num << "\t";
+    cout << endl;
+    
+    nums.clear();
+    cout << "清空nums中的元素后capacity的大小:" << nums.capacity() << endl;
+    
+    nums.resize(10);
+    iota(nums.begin(),nums.begin()+10,1);
+    for (auto num:nums) cout << num << "\t";
+    cout << endl;
+    cout << "重新放入10个元素后capacity的大小:" << nums.capacity() << endl;
+    
+    nums.shrink_to_fit();
+    cout << "使用shrink_to_fit后capacity的大小:" << nums.capacity() << endl;
+    
+    return 0;
+}
+```
+
+### 1.3 遍历其中的元素
+#### 1.3.1 下标索引遍历 
+```c++
+#include <iostream>
+#include <vector>
+
+using namespace std;
+int main() {
+    vector<int> nums(10);
+    for (int i=0; i<nums.size(); i++) {
+        cout << nums[i] << "\n";
+    }
+    return 0;
+}
+```
+#### 1.3.2 通过迭代器遍历
+```c++
+#include <iostream>
+#include <vector>
+#include <numeric>
+
+using namespace std;
+int main() {
+
+    vector<int> nums(10);
+    iota(nums.begin(),nums.end(),1);
+    for (vector<int>::iterator it = nums.begin() ; it != nums.end(); it++) {
+         cout << *it << endl;
+    }
+    
+    return 0;
+}
+```
+#### 1.3.3 使用auto关键字
+```c++
+#include <iostream>
+#include <vector>
+#include <numeric>
+
+using namespace std;
+int main() {
+
+    vector<int> nums(10);
+    iota(nums.begin(),nums.end(),100);
+    for (auto& num: nums) {
+        cout << num << endl; 
+    }
+    
+    return 0;
+}
+```
 
 ## 2 push_back和emplace_back的区别
 

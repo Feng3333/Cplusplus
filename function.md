@@ -56,10 +56,10 @@ void print4() {
 }
 
 int main() {
-    function<void()> func(&print1);
+    function<void()> func(&print3);
     func();
   
-    func = &print2;
+    func = &print4;
     func();
   
     return 0;

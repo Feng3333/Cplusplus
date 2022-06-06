@@ -6,13 +6,23 @@
  
  每次拷贝一个shared_ptr都会使这个引用计数递增（当局部的shared_ptr离开作用域时，计数器就会递减），当引用计数为0（指向对象的最后一个shared_ptr被销毁）时，shared_ptr会销毁这个对象（通过shared_ptr的析构函数）可以使用use_count()方法来获取当前持有资源的引用计数。
  
+ #### 每个 shared_ptr 对象在内部指向两个内存位置：
+ 1、指向对象的指针；  
+ 2、用于控制引用计数的数据的指针；  
+ 
+ #### 共享所有权如何在参考计数的帮助下工作：
+ 1、当新的 shared_ptr 对象与指针关联时，则在其构造函数中，将于此指针关联的引用计数+1；
+ 2、当任何 shared_ptr 对象超出作用域时，则在其析构函数中，它将关联指针的引用计数 -1 ，如果引用计数变为0，则表示没有其他 shared_ptr 对象与次内存相关联，这种情况下，它将使用 delete函数删除该内存
+ 
 ## shared_ptr的初始化：
- ```c++
+ ```cpp
 #include <iostream>
 #include <memory>
  
 int main() {
-  std::shared_ptr<int> sp1(new int(333)); //只能使用直接初始化
+  //只能使用直接初始化
+  std::shared_ptr<int> sp1(new int(333)); //这行代码在堆上创建了两块内存：1：存储int。2：用于引用计数的内存，管理附加此内存的 shared_ptr 对象的计数，最初计数将为1。
+  
   
   std::shared_ptr<int> sp2;
   sp2.reset(new int(333));

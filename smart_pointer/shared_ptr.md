@@ -69,7 +69,7 @@ int main() {
 
 ## 通过模拟实现 shared_ptr 来理解 shared_ptr的使用和原理
 
-#### 基础对象类
+### 基础对象类
 定义的基础对象类 ：Point类，为了后续验证 自定义的智能指针是否有效:
 ```cpp
 class Point{
@@ -98,7 +98,7 @@ public:
 };
 ```
 
-#### 辅助类
+### 辅助类
 辅助类用以封装使用计数与基础对象指针；  
 这个类的所有成员皆为私有类型，只为智能指针使用，还需要把智能指针类声明为辅助类的友元。这个辅助类含有两个数据成员：计数 count 与基础对象指针  
 ```cpp
@@ -116,7 +116,7 @@ class RefPtr {
 };
 ```
 
-#### 为基础对象类实现智能指针类
+### 为基础对象类实现智能指针类
 使用引用计数实现：将一个计数器与类指向的对象相关联，引用计数跟踪共有多少个对象  
 1、当创建智能指针类的新对象时，初始化指针，并将引用计数 count + 1;  
 2、当智能指针类对象作用为另一个对象的副本时：拷贝构造函数复制副本的指向辅助类对象的指针，并增加辅助类对象对基础类对象的引用计数；  
@@ -174,7 +174,7 @@ private:
 };
 ```
 
-#### 自定义智能指针的测试
+### 自定义智能指针的测试
 ```cpp
 int main() {
   //定义一个基础对象指针类
@@ -203,3 +203,94 @@ int main() {
 
 测试结果如下：  
 ![image](https://github.com/Feng3333/Cplusplus/blob/ec0124a6f6b569b96e6d19e82bcfe63ca6f67002/images-folder/SmartPtr1.png)
+
+### 使用模板类来简单实现shared_ptr
+```cpp
+//模板类作为友元时要先声明
+template <typename T> class SmartPtr;
+
+//辅助类
+template <typename T> class RefPtr {
+private:
+  int count;//引用计数
+  T *p; //基础对象指针
+	
+  //定义智能指针类为友元，因为智能指针类需要直接操纵辅助类
+  friend class SmartPtr<T>;
+	
+  //构造函数的参数为基础对象的指针
+  RefPtr(T *ptr):p(ptr), count(1){}
+	  
+  ~RefPtr() {
+   delete p;
+  }
+	
+};
+
+// 智能指针类
+template<typename T> class SmartPtr {
+public:
+  //构造函数
+  SmartPtr(T *ptr):rp(new RefPtr<T>(ptr)){}
+  //拷贝构造
+  SmartPtr(const SmartPtr<T> &sp):rp(sp.rp){
+    ++rp->count;
+  }
+	
+  //重载赋值操作符
+  SmartPtr& operator=(const SmartPtr<T>& rhs) {
+    ++rhs.rp->count;  //首先将右操作数的引用计数+1
+    if (--rp->count ==0 ) {
+      delete rp;
+    }
+    rp = rhs.rp;
+    return *this;
+  }
+	
+  //重载->运算符
+  T* operator->() {
+    return rp->p;
+  }
+  
+  //重载*操作符
+  T & operator*() {
+    return *(rp->p);
+  }
+  
+  //析构函数
+  ~SmartPtr() {
+    if (--rp->count == 0) {
+      std::cout << "引用计数变为0,将释放该指针指向的内存" << std::endl;
+      delete rp;
+    }
+    else {
+      std::cout << "还有" << rp->count << "个指针指向该对象" << std::endl;
+    }
+  }
+
+private:
+  RefPtr<T> *rp;
+};
+```
+使用智能指针类模板来共享其它类型的基础对象：
+```cpp
+int main() {
+  int* num = new int(3);
+  {
+    SmartPtr<int> sptr1(num);
+    std::cout << "sptr1:" << *sptr1 << std::endl;
+    {
+      SmartPtr<int> sptr2(sptr1);
+      std::cout << "sptr2:" << *sptr2 << std::endl;
+      *sptr2 = 5;
+      {
+        SmartPtr<int> sptr3 = sptr1;
+        std::cout << "sptr3:" << *sptr3 << std::endl;
+      }
+    }
+  }
+		
+  std::cout << "num:" << *num << std::endl;
+  return 0;
+}
+```

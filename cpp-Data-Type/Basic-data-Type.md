@@ -26,3 +26,43 @@ long //至少32位，且至少与int一样长
 
 long long //至少64位，且至少与long一样长
 ```
+
+可以使用sizeof来查看某个数据类型的长度（单位字节）
+```cpp
+int num = 12;
+std::cout << "num's(int) bytes is : " << sizeof(num) << std::endl;
+```
+
+整型的 cout ?
+```cpp
+  int num = 9999;
+  std::cout << std::dec;//十进制
+  std::cout << "num is(十进制): " << num << std::endl;
+
+  std::cout << std::hex; //十六进制
+  std::cout << "num is(十六进制): " << num << std::endl;
+
+  std::cout << std::oct; //八进制
+  std::cout << "num is(八进制): " << num << std::endl;
+```
+
+### 无符号类型
+使用关键字 unsigned 来修改声明:
+```cpp
+unsigned short u_s;
+unsigned int u_i;
+unsigned long u_l;
+unsigned long long u_ll;
+unsigned xx; //默认unsigned int
+```
+
+### char类型
+char可以用来存储各种字符（数字，字母，一些特殊符号);  
+
+char为什么只占一个字节？ 
+实际上很多系统支持的字符都不超过128个，因此用一个字节(8 bit)就可以表示所有的符号，char也算作是一种整型；    
+
+字符集中的字符用数值编码(ASCII码)表示
+
+
+### 浮点数

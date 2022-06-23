@@ -32,5 +32,29 @@ int main() {
 
 ## 节省空间？
 
-共享内存：在union中所定义的任何一种数据，这些数据共享同一段内存，以达到节省空间的目的；
+共享内存：在union中所定义的任何一种数据，这些数据共享同一段内存，以达到节省空间的目的；  
 匿名共用体：
+```c++
+#include <iostream>
+#include <string>
+
+struct player{
+  std::string name;
+  union {
+    int i_age;
+    double d_age;
+  };
+};
+
+int main() {
+  player p;
+  p.name = "Messi";
+  p.i_age = 35;
+  std::cout << "name :" << p.name << " i_age: " << p.i_age << std::endl;
+  p.l_age = 36;
+  std::cout << "name :" << p.name << " d_age: " << p.d_age << std::endl;
+  
+  return 0;
+}
+
+```

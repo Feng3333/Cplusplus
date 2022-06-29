@@ -3,7 +3,7 @@
 ```c++
 #include <string>
 ```
-string本质上可以看做是一种vector< char >,也就是元素为char的vector。所以有关 vector的基本操作都可以在string上进行。
+string本质上可以看做是一种vector< char >,也就是元素为char的vector。所以有关 vector的基本操作都可以在string上进行。  
 
 ## string的基本操作
 
@@ -87,7 +87,8 @@ int main() {
 ## find在string类中的运用
 find()的普通用法:  
 
-使用find可以在string中查找对应的字符串或者字符,如果所查找的目标字符或者目标字符串不在当前字符串中出现，则会返回string::npos:  
+使用find可以在string中查找对应的字符串或者字符,如果所查找的目标字符或者目标字符串不在当前字符串中出现，则会返回string::npos;  
+注意点：find会查找到(从起始位置开始)当前字符串中第一次出现目标字符串的位置，之后便会返回;  
 string::npos是一个静态成员常量，表示size_t的最大值（Maximum value for size_t）。该值表示“直到字符串结尾”，通常被用作返回值表明没有匹配到相应的字符。
 ```c++
 #include <iostream>

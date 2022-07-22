@@ -99,3 +99,88 @@ int main() {
 	return 0;
 }
 ```
+注意 : 至少在解引用指针的时候,需要保证指针被正确的初始化或者正确的被赋过某个地址.不然,那样的解引用指针操作无意义且危险!!
+
+### NULL指针 和 void*
+#### NULL指针
+NULL指针着是一种非常特殊的指针，不指向任何东西，即表示不指向任何东西的指针,当然也不能够解引用;  
+
+NULL指针的转换： 赋给这个指针一个0就行了.不用转化,就是整形的0.同样,直接赋NULL也是行的;  
+举个栗子:  
+```c++
+#include <iostream>
+
+using namespace std;
+
+int main() {
+	// 验证 NULL == 0 
+	if (NULL == 0) {
+		cout << "NULL == 0 ? " << "Yes" << endl;
+	}
+
+	int* p_a = 0;
+	int* p_b = NULL;
+	int num = 10;
+	int* p_c = &num;
+
+	cout << "p_a == 0 ? " << (p_a == 0) << endl;
+	cout << "p_b == 0 ? " << (p_b == 0) << endl;
+	cout << "p_c == 0 ? " << (p_c == 0) << endl;
+	
+	// 这里NULL指针解引用会报错
+	//cout << "the address of p_a is " << *p_a << endl;
+	
+	return 0;
+}
+```
+
+由于指针存放的是一个地址.一般来说,地址是整形没错,但是它是一种新的类型来表示地址.和整形并不能够兼容或者运算.但是当使用0来表示空指针的时候,0到底是整形常量还是一个指针常量?  
+因此,在C++11中,新引入了一种特殊类型的字面值nullptr来初始化指针为空指针.他能够被转换成任何类型的指针;
+```c++
+#include <iostream>
+
+using namespace std;
+
+int main() {
+	
+	// 验证nullptr == 0;
+	if (nullptr == 0) {
+		cout << "nullptr == 0" << endl;
+	}
+
+	int num = 10;
+	int* p = nullptr;
+	p = &num;
+	cout << "the address of num is : " << p << endl;
+
+	return 0;
+}
+```
+基本总结 : 尽量定义了对象之后再定义指向这个对象的指针,对于不清楚的指向哪里的指针,最好一律初始化为nullptr(C++11)或者NULL(0).之后再判断是否指向对象再进行相应的操作;  
+
+### void*
+Void\* 是一种特殊类型的指针,能够用来存放任何类型对象的地址.通俗来说,就是不知道这个指针指向的是什么类型的对象.  
+举个栗子:  
+```c++
+#include <iostream>
+
+using namespace std;
+
+int main() {
+	
+	double num = 25.4;
+	//普通指针要保证类型相同
+	double* p_a = &num;
+
+	//void* 可以接受任何类型的指针
+	void* p_b = &num;
+	void* p_c = p_a;
+
+	cout << "p_b : " << p_b << endl;
+	cout << "p_c : " << p_c << endl;
+
+	return 0;
+}
+```
+
+### 指针的指针

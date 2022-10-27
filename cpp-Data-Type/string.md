@@ -214,3 +214,35 @@ int main() {
   }
 }
 ```
+## stringstream
+### 头文件  
+```cpp
+#include <sstream>
+```
+### stringstream的基本作用
+stringstream的作用就是从string对象读取字符或字符串。  
+举个例子：  
+```cpp
+#include <iostream>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+int main(){
+  string str = "abc is ABC";
+  stringstream ss(str);
+  string word;
+  while (ss >> word) {
+    cout << word << endl;
+  }
+//   char c;
+//   while (ss >> c) {
+//     cout << c << "\t";
+//   }
+  return 0;
+}
+
+
+```
+

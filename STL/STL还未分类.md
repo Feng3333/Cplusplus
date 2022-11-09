@@ -103,9 +103,9 @@ int main() {
 代码示例：
 ```c++
 vector<int> n;
-int maxPosition = max_element(n.begin(),n.end()) - n.begin(); //最大值下标
+int maxPosition = max_element(n.begin(),n.end()) - n.begin()); //最大值下标
 
-int minPosition = min_element(n.begin(),n.end()) - n.begin();//最小值下标
+int minPosition = min_element(n.begin(),n.end()) - n.begin());//最小值下标
 
 2）普通数组
 int a[]={1,2,3,4};

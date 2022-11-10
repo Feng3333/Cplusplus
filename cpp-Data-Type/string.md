@@ -278,7 +278,7 @@ using namespace std;
 int main() 
 {
     string words = "abcd##gh";
-    words = words.replace(4,2,"ef"); //这里就将两个##替换成了ef
+    words = words.replace(4, 2, "ef"); //这里就将两个##替换成了ef
     cout << words << endl;
     return 0;
 }
@@ -337,7 +337,7 @@ int main()
     string words = "######bcd";
     char ch = 'a';
     //0：起始位置， 6：需要替换的长度， 2：添加字符的数量， ch：需要添加的字符
-    words = words.replace(0,6,2,ch); 
+    words = words.replace(0, 6, 2, ch); 
     cout << words << endl;
     return 0;
 }

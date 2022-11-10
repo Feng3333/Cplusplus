@@ -1,11 +1,20 @@
 # string类
+
+## 目录
+ - [1. string的基本操作](#1-string的基本操作)
+ - [2. substr在string类的运用](#2-substr在string类的运用)
+ - [3. find在string类中的运用](#3-find在string类中的运用)
+ - [4. stringstream](#4-stringstream)
+ - [5. replace在string中的运用](#5-replace在string中的运用)
+   - [5.1 replace的基本用法](#51-replace的基本用法)
+
+
+## 1. string的基本操作
 头文件：  
 ```c++
 #include <string>
 ```
 string本质上可以看做是一种vector< char >,也就是元素为char的vector。所以有关 vector的基本操作都可以在string上进行。  
-
-## string的基本操作
 
 ### string的创建和初始化
 ```c++
@@ -158,7 +167,7 @@ int main() {
   return 0;
 }
 ```
-## substr在string类的运用
+## 2. substr在string类的运用
 函数原型: string substr(size_t pos = 0, size_t len = npos) const;  
 功能: 从子字符串中获取想要的子字符串  
 参数：
@@ -181,7 +190,7 @@ int main() {
 }
 ```
 
-## find在string类中的运用
+## 3. find在string类中的运用
 find()的普通用法:  
 
 使用find可以在string中查找对应的字符串或者字符,如果所查找的目标字符或者目标字符串不在当前字符串中出现，则会返回string::npos;  
@@ -214,7 +223,7 @@ int main() {
   }
 }
 ```
-## stringstream
+## 4. stringstream
 ### 头文件  
 ```cpp
 #include <sstream>
@@ -242,7 +251,110 @@ int main(){
 //   }
   return 0;
 }
-
-
 ```
 
+## 5. replace在string中的运用
+replace()函数所需要的头文件:
+```
+#include <string>
+```
+replace算法是把队列中的与给定target值相等的所有值替换为另一个值，在此期间整个队列会被扫描一遍，时间复杂度为O(n);  
+即replace的执行要遍历由区间 [start, end] 限定的整个队列,并把 old_value 替换成 new_value;  
+
+### 5.1 replace的基本用法
+
+#### 5.1.1 用法1 用str替换指定字符串从起始位置pos开始长度为len的字符
+```
+string & replace(size_t pos, size_t len, const string& str); 
+// pos: 开始遍历的起始位置 
+// len: 需要遍历的长度
+// str: 需要替换成的字符或字符串
+```
+参考示例 :
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+int main() 
+{
+    string words = "abcd##gh";
+    words = words.replace(4,2,"ef"); //这里就将两个##替换成了ef
+    cout << words << endl;
+    return 0;
+}
+```
+
+#### 5.1.2 用法2 用str替换 迭代器起始位置 和 结束位置 的字符 
+参考示例 :
+```
+#include <iostream>
+#include <string>
+using namespace std;
+int main() 
+{
+    string words = "######bcd";
+    words = words.replace(words.begin(), words.begin() + 6, "a"); //用a来替换从words.begin()开始的后6个字符
+    cout << words << endl;
+    return 0;
+}
+```
+
+#### 5.1.3 用法3 用substr的指定子串（给定起始位置和长度）替换从指定位置上的字符串
+参考示例 :
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+int main() 
+{
+    string words = "######bcd";
+    string str = "aabbbb";
+    words = words.replace(0, 6, str, str.find('a'), 1);
+    cout << words << endl;
+    return 0;
+}
+```
+这里包含的参数比较多，解释一下 :
+```cpp
+words.replace(size_t pos, size_t len, const string& str, size_t str_pos, size_t str_len);
+/*
+pos: 原生字符串的开始遍历位置
+len: 需要在原生字符串中遍历的长度
+str: 目标字符串，即需要从中选取某一部分作为new_str去替换原生字符串中的old部分;
+str_pos: 需要从str中开始选取new_str的的起始位置
+str_len: 选取的new_str的长度
+*/
+```
+
+#### 5.1.4 用法4 用重复n次的c字符替换从指定位置pos长度为len的内容 
+参考示例 : 
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+int main() 
+{
+    string words = "######bcd";
+    char ch = 'a';
+    //0：起始位置， 6：需要替换的长度， 2：添加字符的数量， ch：需要添加的字符
+    words = words.replace(0,6,2,ch); 
+    cout << words << endl;
+    return 0;
+}
+```
+
+#### 5.1.4 用法5 用重复n次的c字符替换从指定迭代器位置（从i1开始到结束）的内容 
+参考示例 :
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+int main() 
+{
+    string words = "######bcd";
+    char ch = 'a';
+    words = words.replace(words.begin(), words.begin() + 6, 4, ch);
+    cout << words << endl;
+    return 0;
+}
+```

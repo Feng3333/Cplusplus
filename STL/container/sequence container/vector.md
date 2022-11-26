@@ -6,6 +6,8 @@
   - [1.2 删除元素](#12-删除元素)
   - [1.3 遍历其中的元素](#13-遍历其中的元素)
 - [2. push_back和emplace_back的区别](#2-push_back和emplace_back的区别)
+- [3. 在vector中查找元素](#3-在vector中查找元素)
+  - [3.1 使用find函数](#31-使用find函数)
 
 
 ## 1 实现原理
@@ -321,4 +323,12 @@ push_back:
 调用构造函数
 调用拷贝构造函数
 ```
-
+## 3 在vector中查找元素
+### 3.1 使用find函数
+ 不同于其他容器, vector中使用find并没有提供 .find()的方法，需要手动补全:
+ ```cpp
+ ...
+ vector<int> nums = {1,2,3,4,5,7};
+ vector<int>::iterator it = find(nums.begin(), nums.end(), 6);
+ ...
+ ```

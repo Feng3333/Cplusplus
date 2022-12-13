@@ -8,7 +8,9 @@
 - [2. push_back和emplace_back的区别](#2-push_back和emplace_back的区别)
 - [3. 在vector中查找元素](#3-在vector中查找元素)
   - [3.1 使用find函数](#31-使用find函数)
-
+- [4. vector中的sort和迭代器](#4-vector中的sort和迭代器)
+  - [4.1 sort排序](#41-sort排序)
+  - [4.2 迭代器](#42-迭代器)
 
 ## 1 实现原理
 C++中的vector本质上是一个动态数组（vector的底层实现原理为一维数组），它的元素是连续存储的，这意味着不仅可以通过迭代器访问元素，还可以使用指向元素的常规指针来对其进行访问。  
@@ -332,3 +334,106 @@ push_back:
  vector<int>::iterator it = find(nums.begin(), nums.end(), 6);
  ...
  ```
+## 4 vector中的sort和迭代器
+### 4.1 sort排序
+使用sort可以对vector中元素进行排序,默认从小到大的顺序
+```cpp
+#include <iostream>
+#include <algorithm>
+#include <vector>
+
+int main()
+{
+    std::vector<int> nums = {1, 3, 5, 2, 4, 0};
+    sort(nums.begin(), nums.end()); //默认排序从小到大 
+    //sort(nums.begin(), nums.end(), std::less<int>());
+    for (auto& num : nums) {
+        std::cout << num << " ";
+    }
+    sort(nums.begin(), nums.end(), std::greater<int>()); //从大到小排序
+    for (auto& num : nums) {
+        std::cout << num << " ";
+    }
+    return 0;
+}
+```
+
+sort也可以使用自定义的排序规则
+```cpp
+    auto cmp = [](const int& a, const int& b){ //这里建议使用引用传递，
+        return a < b;
+    };
+    std::vector<int> nums = {1, 3, 5, 2, 4, 0};
+    sort(nums.begin(), nums.end(), cmp);
+    for (auto& num : nums) {
+        std::cout << num << " ";
+    }
+```
+
+### 4.2 迭代器
+
+一般来说，可以使用iterator ，begin(), end()来对vector进行遍历访问，上文1.3已介绍过这里不再赘述，
+这里主要介绍c++中的新特性:rbegin(), rend(), cbegin(), cend();
+
+#### cbegin(), cend()
+ - iterator,const_iterator作用：遍历容器内的元素，并访问这些元素的值。iterator可以改元素值,但const_iterator不可改。
+ - const_iterator 对象可以用于const vector 或非 const vector,它自身的值可以改(可以指向其他元素),但不能改写其指向的元素值
+ - cbegin()和cend()是C++11新增的，它们返回一个const的迭代器，不能用于修改元素
+
+```cpp
+#include <iostream>
+#include <algorithm>
+#include <vector>
+
+int main()
+{
+    std::vector<int> nums = {6,4,5,2,19,9};
+    for (auto it = nums.cbegin(); it != nums.cend(); it++) {
+         std::cout << *it << " ";
+    }
+    std::cout << std::endl;
+    sort(nums.begin(), nums.end()); //这里如果使用cbegin(),cend()会报错
+    for (auto it = nums.cbegin(); it != nums.cend(); it++) {
+        std::cout << *it << " ";
+    }
+    return 0;
+}
+```
+#### rbegin(), rend()
+
+与begin()和end()相反，rbegin()表示容器的末尾，rend()表示容器的起始位置
+
+```c++
+    std::vector<int> nums = {6,4,5,2,19,9};
+    //这里的元素将倒序输出
+    for (auto it = nums.rbegin(); it != nums.rend(); it++) { 
+         std::cout << *it << " "; 
+    }
+```
+
+在sort中使用时,排序规则也会有相应的变化,可以简单理解为：容器中的元素排好序后，会从末尾位置开始依次往前放置元素
+```cpp
+#include <iostream>
+#include <algorithm>
+#include <vector>
+
+int main()
+{
+    std::vector<int> nums = {6,4,5,2,19,9};
+    for (auto it = nums.rbegin(); it != nums.rend(); it++) {
+         std::cout << *it << " ";
+    }
+    std::cout << std::endl;
+    sort(nums.rbegin(), nums.rend()); //这里直观上看元素是从大到小排序的
+    for (auto it = nums.cbegin(); it != nums.cend(); it++) {
+        std::cout << *it << " ";
+    }
+    return 0;
+}
+```
+
+result :
+```
+9 19 2 5 4 6 
+19 9 6 5 4 2 
+```

@@ -414,3 +414,15 @@ int main(){
 排序后：4 0 3 1 2 5 6 7 8
 第六个元素是 6;
 ```
+
+## std::reduce
+需包含的头文件:
+```c++
+#include <numeric>
+```
+操作: 将某个区间内的元素按照指定方式求值;  
+- 与std::accumulate有点像，两者的区别是:  
+accmumlate一般是按照顺序处理元素并进行操作的, 但reduce并不是依次执行的;  
+两者的运行效率在不同的情况下是不太一样的，比如处理int型时一般是accumulate更优, 处理double型时一般是reduce更优;  
+
+- ps: 目前由于编译器和本地ide的原因，在vscode上使用std::reduce报错 ( 说是没有定义该函数, 但是我看了numeric里面确实已经定义了 ) , 无法进行一系列的验证和测试... google了一下也没有比较好的解决方法...  

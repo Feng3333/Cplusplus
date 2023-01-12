@@ -7,6 +7,7 @@
  - [4. stringstream](#4-stringstream)
  - [5. replace在string中的运用](#5-replace在string中的运用)
    - [5.1 replace的基本用法](#51-replace的基本用法)
+ - [6. string的拼接效率问题](#6-string的拼接效率问题)
 
 
 ## 1. string的基本操作
@@ -358,3 +359,10 @@ int main()
     return 0;
 }
 ```
+
+## 6. string的拼接效率问题
+
+### 6.2 str = str + "a" 和 str += "a"之间的区别
+- str = str + "a" 中加的运算会先申请一个临时的内存空间来存放 str + "a" 表达式的值, 而后再把值赋给 str, 最后还要释放临时申请的这个内存空间;
+- str += "a" 会直接找到str的地址, 并且直接修改其值, 这个过程中涉及到的是对象的引用, 操作时也是直接返回引用，避免了产生新的对象;
+所以前者的效率相较于后者会低一些

@@ -163,3 +163,64 @@ h2 : 可以实现信息隐藏. 静态数据成员可以是private成员, 而全�
 ```
 
 ### 2.2 静态成员函数
+静态成员函数为类的全部服务而不是为某一个类的具体对象服务.   
+静态成员函数与静态数据成员一样, 都是类的内部实现, 属于类定义的一部分.   
+普通的成员函数一般都隐含了一个this指针, this指针指向类的对象本身，因为普通成员函数总是具体的属于某个类的具体对象的. 通常情况下, this是缺省的. 如函数 fn() 实际上是 this->fn(). 
+与普通函数相比, 静态成员函数由于不是与任何的对象相联系, 因此它不具有this指针. 从这个意义上讲, 它无法访问属于类对象的非静态数据成员, 也无法访问非静态成员函数, 它只能调用其余的静态成员函数.  
+简单举例 ：
+```c++
+#include <iostream>
+#include <numeric>
+#include <algorithm>
+
+class Myclass
+{
+public:
+    Myclass(int a, int b, int c){
+        this->a = a;
+        this->b = b;
+        this->c = c;
+        sum += a + b + c;
+    };
+
+    static void GetSum(); //声明静态成员函数
+
+private:
+    int a, b, c;
+    static int sum; // 声明为静态数据成员
+    
+};
+int Myclass::sum = 0; // 定义并初始化静态函数成员
+
+void Myclass::GetSum() //静态成员函数的实现
+{
+    //std::cout << a << std::endl; // error:invalid use of member ‘Myclass::a’ in static member function
+    std::cout << "sum = " << sum << std::endl;
+}
+
+int main() {
+    Myclass M(1, 2, 3);
+    M.GetSum();
+    Myclass N(4, 5, 6);
+    N.GetSum();
+    Myclass::GetSum();
+    return 0;
+}
+```
+上述代码的运行结果 :
+```
+sum = 6
+sum = 21
+sum = 21
+```
+静态成员函数的特点:
+- 出现在类体外的函数定义不能指定关键字static;  
+- 静态成员之间可以相互访问, 包括静态成员函数访问静态数据成员和访问静态成员函数;  
+- 非静态成员函数可以任意地访问静态成员函数和静态数据成员;  
+- 静态成员函数不能访问非静态成员函数和非静态数据成员;  
+- 由于没有this指针的额外开销,因此静态成员函数比类的全局函数相比速度上会有少许的增长;
+- 调用静态成员函数,可以用成员访问操作符(.)和(->)为一个类的对象或指向类对象的指针调用静态成员函数, 也可以直接使用如下格式 调用类的静态成员函数
+```
+<类名>::<静态成员函数名> (<参数表>)
+```
+- 静态成员函数的作用: 主要是为了方便, 不需要生成对象就能调用;  

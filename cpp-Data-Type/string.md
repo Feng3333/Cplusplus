@@ -391,6 +391,12 @@ int main() {
     return 0;
 }
 ```
+### c++中的语法
+```c++
+postfix-expression [expression]
+```
+通常，postfix-expression 表示的值是指针值(比如数组标志符) 和 expression 是整数值(包括枚举类型)。但是，从语法上来说，只需要一个表达式是指针类型，另一个表达式是整型。  
+因此，整数值可以位于 postfix-expression 位置，指针值可以位于表达式或下标位置的方括号中。
 
 ### c++中奇怪的点????!!!!
 ```c++

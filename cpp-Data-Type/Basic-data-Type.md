@@ -154,3 +154,9 @@ typedef unsigned int int32_t;
 ```
 为了程序的可扩展性, 假如将来需要的数据⼤⼩变成了64bit时,只需要将typedef long long size_t就可以了, 不然可能需要重新修改很多地方;  
 这种设计同样可以应⽤到⾃⼰的开发中来,当⾃⼰设计⼀个int类型保存某种数据时,但⼜没把握将来是不是要⽤long int时，就可以引用自己定义的一个数据类型；  
+
+
+### 避免科学计数法
+```c++
+std::cout << std::fixed << num << std::endl;  //当num足够大时
+```

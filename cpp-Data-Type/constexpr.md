@@ -6,6 +6,7 @@
  - [4. constexpr函数](#4-constexpr函数)
  - [5. 字面值类型](#5-字面值类型)
  - [6. 指针和constexpr](#6-指针和constexpr)
+ - [7. 字面值常量类](#7-字面值常量类)
  
 ## 1. 基本介绍
 constexpr表达式是指值不会改变并且在编译过程就能得到计算结果的表达式.   
@@ -84,12 +85,27 @@ int a[scale(i)];    // 错误：scale(i)不是常量表达式
 (1) 如果在constexpr声明中定义了一个指针，限定符constexpr仅对指针有效，与指针所指的对象无关。
 ```cpp
 const int *p = nullptr;       // p是一个指向整数常量的指针
-constexpr int *q = nullptr;   // q是一个指向整数的常量指针
+constexpr int *q = nullptr;   // q是一个指向整数的指针常量
 ```
-q是一个常量指针，因为constexpr把它所定义的对象置为了顶层const。类似于: int \*const q = nullptr;
+q是一个指针常量，因为constexpr把它所定义的对象置为了顶层const。类似于: int \*const q = nullptr;
 
-(2) 与其他常量指针类似，constexpr指针既可以指向常量也可以指向一个非常量：
+(2) 与其他指针常量类似，constexpr指针既可以指向常量也可以指向一个非常量：
 ```cpp
 constexpr int *np = nullptr;     // np是一个指向整数的常量指针，其值为空
-
+int j = 0;
+constexpr int i = 40;            // i的类型为整数常量
+constexpr const int *p = &i;     // p是指针常量，指向整数常量
+constexpr int *p1 = &j;          // p1是指针常量，地址不可修改，指向整数j
 ```
+
+## 7. 字面值常量类
+constexpr函数的参数和返回值必须是字面值类型。注意，函数的返回值必须是字面值类型，但可以不是一个常量。  
+和其他类不同，字面值类型的类可能含有constexpr函数成员。这样的成员必须符合constexpr函数的所有要求，他们是隐式const。  
+
+字面值常量类： 数据成员都是字面值类型的聚合类。如果一个类不是聚合类，但它符合下述要求，则它也是一个字面值常量类：
+- 数据成员都必须是字面值类型。
+- 类必须至少含有一个constexpr构造函数。
+- 如果一个数据成员含有类内初始值，这内置类型成员的初始值必须是一条常量表达式；如果成员属于某种类类型，这初始值必须使用成员自己的constexpr构造函数。
+- 类必须使用析构函数的默认定义，该成员负责销毁类的对象。
+
+尽管构造函数不能是const的，但是字面值常量类的构造函数可以是constexpr函数。一个字面值常量类必须至少提供一个constexpr构造函数。

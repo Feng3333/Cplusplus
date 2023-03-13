@@ -3,6 +3,7 @@
 ## 目录
  - [基本介绍](#基本介绍)
  - [具体实现](#具体实现)
+ - [OpenMP常用函数](#openmp常用函数)
 
 ## 基本介绍
 头文件
@@ -63,3 +64,76 @@ omp_get_thread_num()
 ```c++
 omp_set_num_threads()
 ```
+
+## OpenMP的并行区域
+```c++
+#pragma omp parallel // 大括号内为并行区域
+{
+   ...
+}
+```
+
+### for循环并行化的基本用法
+#### 数据不相关性
+利用OpenMP 实现for循环的并行化，需满足数据的不相关性。  
+在循环并行化时，多个线程同时执行循环，迭代的顺序是不确定的。如果数据是非相关的，那么可以采用基本的(如下)
+```c++
+#pragma omp parallel for
+```
+预处理指示符。
+
+如果语句 S1 和语句 S2 相关，那么必然存在以下两种情况之一：
+- 1. 语句S1在一次迭代中访问存储单元L，而S2在随后的一次迭代中访问同一存储单元，则称之为循环迭代相关(loop carried dependence)；
+- 2. S1和S2在同一循环迭代中访问同一存储单元L，但S1的执行在S2之前，则称之为非循环迭代相关(loop-independent dependence);
+
+#### for循环并行化的几种声明方式
+```c++
+#include <iostream>
+#include <omp.h>
+
+int main() {
+    // 声明形式一
+    #pragma omp parallel 
+    {
+        #pragma omp for
+        for (int i = 0; i < 10; ++i) {
+            std::cout << i << std::endl;
+        }
+    }
+    
+    // 声明形式二
+    #pragma omp parallel for
+    for (int i = 0; i < 10; ++i) {
+        std::cout << i << std::endl;
+    }
+    
+    return 0;
+}
+```
+上述代码中的两种声明形式是一样的，第二种声明形式更为简介，不过，第一种形式有一个好处：可以在并行区域内、for循环以外插入其他并行代码：
+```cpp
+// 声明形式一
+#pragma omp parallel 
+{
+    std::cout << "OK." << std::endl;
+    #pragma omp for
+    for (int i = 0; i < 10; ++i) {
+        std::cout << i << std::endl;
+    }
+}
+```
+
+#### for循环并行化的约束条件
+尽管OpenMP可以很方便的对for循环进行并行化，但并不是所有的for循环都可以并行化。  
+以下几种情形的for循环就无法使用OpenMP并行化：  
+-  for循环的循环变量必须是有符号型，例如使用下述例子便无法编译通过
+```c++
+#pragma omp parallel for
+for (unsigned int i = 0; i < 10; ++i) {
+    ...
+}
+```
+- for循环的比较操作符必须是: ==, <, <=, >, >= 。for中使用auto或者 比较操作符为 != 则会编译不通过
+- for循环的增量必须是整数的加减，而且必须是一个循环不变量。例如，for (int i = 0; i < 10; i = i + 1) 编译不通过；(目前只支持i++, i--, ++i, --i)
+- for循环的比较操作符如果是 <, <=, 那么循环变量只能增加。例如，for (int i = 0; i != 10; --i) 编译不通过；
+- for循环必须是单入口，单出口 ==。循环内部不允许能够达到循环以外的跳出语句，exit除外。异常的处理也不必须在循环体内部处理。例如，如循环体内的break或者goto语句，会导致编译不通过。

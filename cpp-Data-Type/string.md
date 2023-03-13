@@ -8,7 +8,8 @@
  - [5. replace在string中的运用](#5-replace在string中的运用)
    - [5.1 replace的基本用法](#51-replace的基本用法)
  - [6. string的拼接效率问题](#6-string的拼接效率问题)
- - [7. c++中的字符字面值](#7-c++中的字符字面值)
+ - [7. c++中的字符字面值](#7-c中的字符字面值)
+ - [8. c_str()](#8-c_str)
 
 ## 1. string的基本操作
 头文件：  
@@ -433,3 +434,6 @@ int main() {
 }
 ```
 
+## 8. c_str()
+- c_str()就是将C++的string转化为C的字符串数组；  
+- C中没有string，所以函数c_str()就是将C++的string转化为C的字符串数组，c_str()生成一个const char\*指针，指向字符串的首地址

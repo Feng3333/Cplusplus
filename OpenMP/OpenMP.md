@@ -4,6 +4,7 @@
  - [基本介绍](#基本介绍)
  - [具体实现](#具体实现)
  - [OpenMP常用函数](#openmp常用函数)
+ - [for循环并行化的基本用法](#for循环并行化的基本用法)
 
 ## 基本介绍
 头文件
@@ -137,3 +138,66 @@ for (unsigned int i = 0; i < 10; ++i) {
 - for循环的增量必须是整数的加减，而且必须是一个循环不变量。例如，for (int i = 0; i < 10; i = i + 1) 编译不通过；(目前只支持i++, i--, ++i, --i)
 - for循环的比较操作符如果是 <, <=, 那么循环变量只能增加。例如，for (int i = 0; i != 10; --i) 编译不通过；
 - for循环必须是单入口，单出口 ==。循环内部不允许能够达到循环以外的跳出语句，exit除外。异常的处理也不必须在循环体内部处理。例如，如循环体内的break或者goto语句，会导致编译不通过。
+
+```cpp
+#include <iostream>
+#include <omp.h>
+
+int main() {
+    int a[10] = {1};
+    int b[10] = {2};
+    int c[10] = {3};
+
+#pragma omp parallel
+{
+    #pragma omp for
+    for (size_t i = 0; i < 10; ++i) {
+        c[i] = a[i] + b[i];
+    }
+}
+    for (int i = 0; i < 10; ++i) {
+        std::cout << c[i] << " \n"[i==9];
+    }
+    
+    return 0;
+}
+```
+
+####  嵌套for循环
+```cpp
+#include <iostream>
+#include <vector>
+#include <omp.h>
+
+int main() {
+    std::vector<std::vector<int>> matrix(10, std::vector<int>(10));
+    
+    #pragma omp parallel
+    {
+        #pragma omp for
+        for (int i = 0; i < 10; ++i) {
+            for (int j = 0; j < 10; ++j) {
+                matrix[i][j] = i + j;
+            }
+        }
+    }
+    
+    return 0;
+}
+```
+编译器会让第一个线程完成
+```cpp
+for (int i = 0; i < 5; ++i) {
+    for (int j = 0; j < 10; ++j) {
+         matrix[i][j] = i + j;
+    }
+}
+```
+编译器会让第二个线程完成
+```cpp
+for (int i = 5; i < 10; ++i) {
+    for (int j = 0; j < 10; ++j) {
+         matrix[i][j] = i + j;
+    }
+}
+```

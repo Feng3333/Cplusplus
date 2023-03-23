@@ -5,6 +5,8 @@
  - [具体实现](#具体实现)
  - [OpenMP常用函数](#openmp常用函数)
  - [for循环并行化的基本用法](#for循环并行化的基本用法)
+ - [数据的共享和私有化](#数据的共享和私有化)
+ - [互斥所同步机制与事件同步机制](#互斥所同步机制与事件同步机制)
 
 ## 基本介绍
 头文件
@@ -201,3 +203,188 @@ for (int i = 5; i < 10; ++i) {
     }
 }
 ```
+
+## 数据的共享和私有化
+- 在并行区域内，若多个线程共同访问同一个存储单元，并且至少会有一个线程更新数据单元中的内容时，会发生数据竞争；
+#### 并行区域内的变量共享和私有
+除了以下三种情况外，并行区域中的所有变量都是共享的：
+- 并行区域中定义的变量；
+- 多个线程用来完成循环的循环变量；
+- private、firstprivate、lastprivate、reduction修饰的变量
+例如：
+```c++
+#include <iostream>
+#include <omp.h>
+
+int main() {
+    int share_a = 0; // 共享变量
+    int share_to_private_b = 1;
+    
+#pragma omp parallel
+{
+    int private_c = 2;
+    // 通过private修饰后在并行区域内变为私有变量
+    #pragma omp for private(share_to_private_b)
+    for (int i = 0; i < 10; ++i) {
+        // 该循环变量是私有的，若为两个线程，则一个线程执行0 <= i < 5,另一个执行5 <= i < 10
+        std::cout << i << std::endl;
+    }
+}
+    
+    return 0;
+}
+```
+
+#### 共享与私有变量声明方法
+- private(val1, val2, ...) : 并行区域中变量val是私有的，即每个线程拥有该变量的一个copy
+- firstprivate(val1, val2, ...) : 与private不同，每个线程在开始的时候都会对该变量进行一次初始化
+- lastpriavte(val1, val2, ...) : 与private不同，并发执行的最后一次循环的私有变量将会copy到val
+- shared(val1, val2, ...) : 声明val是共享的
+
+private示例：
+```cpp
+#include <iostream>
+#include <omp.h>
+
+int main() {
+    // 通过private修饰该变量之后在并行区域变为私有变量，进入并行区域后每个线程拥有该变量的拷贝，并且都不会初始化
+    int shared_to_private = 1;
+
+#pragma omp parallel for private(shared_to_private)
+    for (int i = 0; i < 10; ++i) {
+        std::cout << shared_to_private << std::endl;
+    }
+    
+    return 0;
+}
+```
+
+firstprivate示例：
+```cpp
+#include <iostream>
+#include <omp.h>
+
+int main() {
+    // 通过firstprivate修饰该变量之后在并行区域变为私有变量，进入并行区域后每个线程拥有该变量的拷贝，并且会初始化
+    int share_to_first_private = 1;
+
+#pragma omp parallel for firstprivate(share_to_first_private)
+    for (int i = 0; i < 10; ++i) {
+        std::cout << ++share_to_first_private << std::endl;
+    }
+    
+    return 0;
+}
+```
+
+lastprivate示例：
+```cpp
+#include <iostream>
+#include <omp.h>
+
+int main() {
+    // 通过lastprivate修饰该变量之后在并行区域变为私有变量，进入并行区域后变为私有变量，进入并行区域后每个线程拥有该变量的拷贝，并且会初始化
+    int share_to_last_private = 1;
+    
+    std::cout << "Before: " << share_to_last_private << std::endl;
+#pragma omp parallel for firstprivate(share_to_last_private)
+    for (int i = 0; i < 11; ++i) {
+        std::cout << ++share_to_last_private << std::endl;
+    }
+    
+    std::cout << "After: " << share_to_last_private << std::endl;
+    return 0;
+}
+```
+在运行完后，share_to_last_private变量的值变了，其值会后变成最后一次循环的值，即多个线程最后一次修改的share_to_last_private(是share_to_last_private的copy)
+值会赋给share_to_last_private。
+
+shared示例：
+```cpp
+#include <iostream>
+#include <omp.h>
+
+int main() {
+    int sum = 0;
+    std::cout << "Before: " << sum << std::endl;
+#pragma omp parallel for shared(sum)
+    for (int i = 0; i < 10; ++i) {
+        sum += i;
+        std::cout << sum << std::endl;
+    }
+    
+    std::cout << "After: " << sum << std::endl;
+    return 0;
+}
+```
+在上面的代码中，sum本身是共享的，这里的shared的声明作为演示用。由于sum是共享的，多个线程对sum的操作会引起数据竞争
+
+#### reduction的用法：
+```cpp
+#include <iostream>
+#include <omp.h>
+
+int main() {
+    int sum = 0;
+    std::cout << "Before: " << sum << std::endl;
+#pragma omp parallel for reduction(+:sum)
+    for (int i = 0; i < 10; ++i) {
+        sum += i;
+        std::cout << sum << std::endl;
+    }
+    
+    std::cout << "After: " << sum << std::endl;
+    return 0;
+}
+```
+上述代码中：sum是共享的，采用reduction之后，每个线程根据reduction(+:sum)的声明算出自己的sum，然后再将每个线程的sum加起来。
+
+reduction声明可以看做：
+- 保证了对sum的原则操作
+- 多个线程的执行结果通过reduction中声明的操作符进行计算，以加法操作符为例：
+  假设sum的初始化的值为10，reduction(+:sum)声明的并行区域中每个线程的sum初始化为0，并行处理结束之后，会将sum的初始值10以及每个线程所计算的sum值相加。
+- reduction声明形式如下：
+```c++
+reduction(opreator: val1, val2, ...)
+```
+其中operator以及约定变量的初始值如下：  
+![image](https://github.com/Feng3333/Cplusplus/blob/f2f9792bef1e50479c34f7a8d18715f2cbb84cc9/images-folder/OMP_reduction.PNG)
+
+## 互斥所同步机制与事件同步机制
+#### 互斥锁同步
+互斥锁同步的概念类似于Windows中的临界区（Critical Section）以及Windows和Linux中的Mutex以及Vxworks中的SemTake和SemGive（初始化时信号量为满）
+，即对某一块代码操作进行保护，以保证同时只能有一个线程执行该段代码
+
+#### atomic 同步用法
+```
+#pragma omp atomic
+x< + or * or - or * or / or & or | or << pr >> >=expt
+(例如，x <<= 1; or x *= 2)
+
+#pragma omp atomic
+x++ or x-- or --x or ++x
+```
+
+可以看到atomic的操作仅适用于两种情况：
+- 自加减操作；
+- x<上述列出的操作符>=expr
+
+代码示例：
+```c++
+#include <iostream>
+#include <omp.h>
+
+int main() {
+    int sum = 0;
+    std::cout << "Before: " << sum << std::endl;
+#pragma omp parallel for 
+    for (int i = 0; i < 2000; ++i) {
+    #pragma omp atomic
+        sum++;
+    }
+    
+    std::cout << "After: " << sum << std::endl;
+    return 0;
+}
+```
+输出结果为：2000，如果将#pragma omp atomic声明去掉，则结果不确定

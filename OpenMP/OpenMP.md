@@ -42,7 +42,7 @@ int main() {
     return 0;
 }
 ```
-上述代码在需要编译后在执行:
+上述代码需要编译后执行:
 ```
  g++ test.cpp -o test -fopenmp
  ./test

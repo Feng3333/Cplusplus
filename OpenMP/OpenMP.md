@@ -42,7 +42,7 @@ int main() {
     return 0;
 }
 ```
-上述代码需要编译后在执行:
+上述代码在需要编译后在执行:
 ```
  g++ test.cpp -o test -fopenmp
  ./test
@@ -388,3 +388,79 @@ int main() {
 }
 ```
 输出结果为：2000，如果将#pragma omp atomic声明去掉，则结果不确定
+
+#### cirtical同步机制
+Cirtical Section 声明方法
+```c++
+#pragma omp critical [(name)]  // []表示名字可选
+{
+    // 并行程序块，同时只能有一个线程能访问该并行程序块
+}
+
+// 举例：
+#pragma omp critial (tst)
+a = b + c;
+```
+- cirtical section 与 atomic 的区别：临界区critical 可以对某个并行程度块进行保护，atomic所能保护的仅为一句代码。
+示例：
+```c++
+#include <iostream>
+#include <omp.h>
+
+int main() {
+    int sum = 0;
+    std::cout << "Before: " << sum << std::endl;
+    
+ #pragma omp parallel for
+     for (int i = 0; i < 10; ++i) {
+     #pragma omp critial (a)
+         {
+             sum = sum + i;
+             sum = sum + i * 2;
+         }
+     }
+     
+     std::cout << "After: " << sum << std::endl;
+     return 0;
+}
+```
+
+#### 线程同步只互斥锁函数
+互斥锁函数类似于Windows、Linux下的mutex
+- 互斥锁函数:
+```c++
+void omp_init_lock(omp_lock*)       // 初始化互斥锁
+void omp_destroy_lock(omp_lock*)    // 销毁互斥锁
+void omp_set_lock(omp_lock*)        // 获得互斥锁
+void omp_unset_lock(omp_lock*)      // 释放互斥锁
+void omp_test_lock(omp_lock*)       // 试图获得互斥锁，如果获得成功则返回true，否则返回false
+```
+
+- 示例：
+```c++
+#include <iostream>
+#include <omp.h>
+
+static omp_lock_t lock;
+
+int main() {
+    omp_init_lock(&lock);   // 初始化互斥锁
+
+#pragma omp parallel for 
+    for (int i = 0; i < 5; ++i) {
+        omp_set_lock(&lock);  // 获得互斥锁
+        std::cout << omp_get_thread_num() << "+" << std::endl;
+        std::cout << omp_get_thread_num() << "-" << std::endl;
+        omp_unset_lock(&lock); // 释放互斥锁
+    }
+
+    omp_destroy_lock(&lock);  // 销毁互斥锁
+
+    return 0;
+}
+```
+上述示例代码中对for循环中的所有内容进行加锁保护，同时只能有一个线程执行for循环中的内容。  
+线程1或线程2在执行for循环内部代码时不会被打断。如果删除代码中的获得锁释放锁的代码，则相当于没有互斥锁。  
+互斥锁函数中只有omp_test_lock()函数是带有返回值的，该函数可以看做是omp_set_lock的非阻塞版本
+
+#### 线程同步之事件同步机制

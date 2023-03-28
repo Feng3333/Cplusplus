@@ -464,3 +464,5 @@ int main() {
 互斥锁函数中只有omp_test_lock()函数是带有返回值的，该函数可以看做是omp_set_lock的非阻塞版本
 
 #### 线程同步之事件同步机制
+线程同步机制包括互斥锁同步和事件同步。互斥锁同步包括：atomic、critical、mutex函数，其机制与普通多线程同步的机制类似。而事件同步则通过nowait、section、
+single、master等预处理指示符声明来完成

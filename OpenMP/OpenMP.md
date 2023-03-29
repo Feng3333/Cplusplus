@@ -466,3 +466,40 @@ int main() {
 #### 线程同步之事件同步机制
 线程同步机制包括互斥锁同步和事件同步。互斥锁同步包括：atomic、critical、mutex函数，其机制与普通多线程同步的机制类似。而事件同步则通过nowait、section、
 single、master等预处理指示符声明来完成
+
+- 隐式栅障
+栅障(baarrier) 是OpenMP用于线程同步的一种方法，线程遇到栅障时必须等待，直到并行的所有线程都到达同一点。
+需要注意的是：  
+在任务分配for循环和任务分配section结构中隐含了栅障，在parallel，for，sections，single结构的最后，也会有一个隐式的栅障。  
+隐式的栅障会使线程等到所有的线程继续完成当前的循环、结构化块或并行区，在继续执行后续工作。可以使用nowait去掉这个隐式的栅障。
+
+- nowait事件同步
+nowait用来取消栅障，其用法如下：
+```c++
+#pramga omp for nowait   // 不能使用#pramga omp parallel for nowait
+// 或者
+#pramga omp single nowait
+```
+
+示例：
+```c++
+#include <iostream>
+#include <omp.h>
+
+int main() {
+#pragma omp parallel
+{
+    #pragma omp for nowait
+    for (int i = 0; i < 1000; ++i) {
+        std::cout << i << " + " << std::endl;
+    }
+    
+    #pragma omp for
+    for (int j = 0; j < 10; ++j) {
+        std::cout << j << " - " << std::endl;
+    }
+}
+
+    return 0;
+}
+```

@@ -7,6 +7,7 @@
  - [for循环并行化的基本用法](#for循环并行化的基本用法)
  - [数据的共享和私有化](#数据的共享和私有化)
  - [互斥所同步机制与事件同步机制](#互斥所同步机制与事件同步机制)
+ - [线程的调度优化](#线程的调度优化)
 
 ## 基本介绍
 头文件
@@ -503,3 +504,81 @@ int main() {
     return 0;
 }
 ```
+运行上述程序时，可以看到第一个for循环的两个线程中的一个执行完之后，会继续向下执行，因此同时打印了第一个循环 + 和第二个循环的 - 。  
+如果去掉第一个循环里的nowait声明，则第一个for循环的两个线程都执行完之后，才开始同时执行第二个for循环。也就是说，通过#pragma omp for 声明的for
+循环结束时会有一个默认的隐式栅障。
+
+- 显示同步栅障 #pragma omp barrier
+```c++
+#include <iostream>
+#include <omp.h>
+
+int main() {
+#pragma omp parallel
+{
+    for (int i = 0; i < 100; ++i) {
+        std::cout << i << " + " << std::endl;
+    }
+    
+    #pragma omp barrier
+    for (int j = 0; j < 10; ++j) {
+        std::cout << j << " - " << std::endl;
+    }
+}
+
+    return 0;
+}
+```
+运行上述程序，可以看出两个线程执行了第一个for循环，当两个线程同时执行完第一个for循环之后，在barrier处进行了同步，然后执行后边的for循环
+
+- master事件同步
+通过# pragma omp master 来声明对应的并行程序块只有主线程完成
+```c++
+#include <iostream>
+#include <omp.h>
+
+int main() {
+#pragma omp parallel
+{
+    #pragma omp master
+    {
+        for (int i = 0; i < 10; ++i) {
+            std::cout << i << " + " << std::endl;
+        }
+    }
+
+    std::cout << "This will printed twice." << std::endl;
+}
+    return 0;
+}
+```
+运行上述程序，可以看到进入parallel声明的并行区域后，创建了两个线程。主线程执行了for循环；而另一个线程没有执行for循环，并且直接开始进入了for循环之后的打印语句，然后执行for循环
+的线程随后还会在执行一次后边的打印语句
+
+- sections 指定不同的线程执行不同的部分
+示例：
+```c++
+#include <iostream>
+#include <omp.h>
+
+int main() {
+// 声明该并行区域分为若干个section，section之间的运行顺序为并行
+#pragma omp parallel sections
+{
+    for (int i = 0; i < 5; ++i) {
+        std::cout << i << " + " << std::endl;
+    }
+
+#pragma omp section
+    for (int j = 0; j < 5; ++j) {
+        std::cout << j << " - " << std::endl;
+    }
+}
+    return 0;
+}
+```
+
+## 线程的调度优化
+由omp生成的并行区域，在默认情况下会自动生成与CPU个数相等的线程，然后并行执行并行区域的代码。  
+对于并行区域中的for循环有特殊的声明方式，这样不同的线程可以分别运行for循环变量的不同部分。通过锁同步(atomic、critical、mutex函数)或事件同步
+(nowait、single、section、master)来实现并行区域的同步控制。

@@ -581,4 +581,76 @@ int main() {
 ## 线程的调度优化
 由omp生成的并行区域，在默认情况下会自动生成与CPU个数相等的线程，然后并行执行并行区域的代码。  
 对于并行区域中的for循环有特殊的声明方式，这样不同的线程可以分别运行for循环变量的不同部分。通过锁同步(atomic、critical、mutex函数)或事件同步
-(nowait、single、section、master)来实现并行区域的同步控制。
+(nowait、single、section、master)来实现并行区域的同步控制。  
+
+### 调度策略
+- static： 循环变量区域分为n等份，每个线程平分n份任务；  适用于各个cpu性能差异不大的场景
+- dynamic：  循环变量区域分为n等份，某个线程执行完1份之后执行其他需要执行的那份任务；  适用于cpu之间运行能力差异较大的场景
+- guided：  循环变量区域由大到小分为不等的n份，运行方法与dynamic类似；  由于任务比dynamic不同，所以可以减小调度开销
+- runtime： 在运行时来适用上述三种调度策略中的一种，默认使用static
+
+### 简单的代码示例：
+
+- static
+```c++
+#include <iostream>
+#include <omp.h>
+
+int main() {
+
+// static调度策略，for循环每两次迭代分为一个任务
+#pragma omp parallel for schedule(static, 2)
+    for (int i = 0; i < 10; ++i) {
+        std::cout << " thread id is " << omp_get_thread_num() << " num i : " << i << std::endl;
+    }
+
+    return 0;
+}
+```
+
+- dynamic
+```c++
+#include <iostream>
+#include <omp.h>
+
+int main() {
+
+#pragma omp parallel for schedule(dynamic, 2)
+    for (int i = 0; i < 10; ++i) {
+        // dynamic调度策略，分为5个任务，只要有任务并且线程空闲，那么该线程会执行该任务
+        std::cout << " thread id is " << omp_get_thread_num() << " num i : " << i << std::endl;
+    }
+
+    return 0;
+}
+```
+
+- guided
+guided调度策略与dynamic区别在于：所分的任务块是从大到小排列的。具体分块算法为：每块的任务大小为【迭代次数 / 线程个数的2倍】。
+其中每个任务的最小迭代次数有guided声明设定，默认为1。
+```c++
+#pragma omp for schedule [guided, 80]
+    for (int i = 0; i < 800; ++i) {
+        ...
+    }
+```
+如果有两个cpu。那么任务分配如下：
+```
+第一个任务： [800 / (2 * 2)] = 800;
+
+第二个任务： 第一个任务分了200 ，还有600 [600 / (2 * 2) ] = 150;
+
+第三个任务： [(600 - 150) / (2 * 2)] = 113;
+
+第四个任务： [(450 - 113) / (2 * 2)] = 85;
+
+第五个任务： [(337 - 252) / (2 * 2)] = 63 ,由于小于声明的80，所以这里为80；
+
+第六个任务： 计算小于80，所以分配80
+
+第七个任务： 计算小于80，所以根据声明，这里为80
+
+第八个任务： 12，最后剩下12已小于80的迭代次数，所以为12
+第二个任务：
+
+```

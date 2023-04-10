@@ -136,6 +136,11 @@ int main() {
 ### 1.2 删除元素
 
 删除元素和新增差不多，可以使用pop_back删除最后一个元素或者通过迭代器删除任一元素；  
+- 删除vector的最后一个元素：
+```c++
+vector<int> nums(10);
+nums.pop_back();
+```
 通过迭代器删除还是要先找到要删除元素的位置，即int index = iter - begin(), 而这个位置后面的每个元素都要向前移动一个元素的位置；  
 
 举个例子：
@@ -172,6 +177,7 @@ int main() {
 ```
 运行结果：  
 ![image](https://github.com/Feng3333/Cplusplus/blob/c9c514e5a8df8e6181ae8b0bcc82d4344ec5d4dd/images-folder/vector-delete1.png)
+
 
 #### 清空vector  
 清空vector中的所有元素：  

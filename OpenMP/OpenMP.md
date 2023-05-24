@@ -15,6 +15,13 @@
 ```
 #include <omp.h>
 ```
+CmakeLists.txt文件：
+```
+find_package(OpenMP REQUIRED)
+...
+target_link_libraries(OpenMP::OpenMP_CXX)
+```
+
 OpenMP:多线程文件操作  
 OpenMP是由OpenMP Architecture Review Board牵头提出的，并已被广泛接受，用于共享内存并行系统的多处理器程序设计的一套指导性编译处理方案(Compiler Directive)  
 OpenMP支持的编程语言包括C、C++和Fortran；而支持OpenMp的编译器包括Sun Compiler，GNU Compiler和Intel Compiler等。  

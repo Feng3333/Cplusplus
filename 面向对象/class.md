@@ -4,12 +4,12 @@
  - [1.基本介绍](#1-基本介绍)
  - [2.对象的初始化和清理](#2-对象的初始化和清理)
 
-## 1.基本介绍
+## 1. 基本介绍
 C++中使用class关键字来创建一个新的对象:
 - class中有三种类型的封装：public、 private、protected；
 - 区别于struct结构体，class里面的成员默认是private的;
 
-## 2.对象的初始化和清理
+## 2. 对象的初始化和清理
 C++利用构造函数和析构函数解决对象的初始化和清理工作，这两个函数会被编译器自动调用；  
 - 构造函数：主要作用在于创建对象时为对象的成员属性进行赋值，构造函数由编译器自动调用；  
 - 析构函数：主要作用在于对象销毁前系统自动调用，执行一些清理工作；  
@@ -87,5 +87,158 @@ int main()
 
 代码示例：
 ```c++
+#include <iostream>
+#include <string>
 
+#ifndef TEST_H
+#define TEST_H
+
+class Person {
+public:
+    Person() {
+        std::cout << " 无参数构造函数 " << std::endl;
+    }
+
+    Person(int num) {
+        age = num;
+        std::cout << " 有参数构造函数 " << std::endl;
+    }
+
+    Person(const Person& p) {
+        age = p.age;
+        std::cout << " 拷贝构造函数 " << std::endl;
+    }
+    
+    ~Person() {
+        std::cout << " 析构函数 " << std::endl;
+    }
+    
+public:
+    int32_t age;
+};
+
+#endif // TEST_H
 ```
+```c++
+#include "test.h"
+
+void test01()
+{
+    Person p; //调用无参数的构造函数
+    /* Person p() 调用无参数构造函数不能加括号，如果加了编译器就会认为这是一个函数声明 */
+}
+
+// 调用有参数的构造函数
+void test02()
+{   
+    // 括号法，
+    Person p1(10);
+
+    // 显式法
+    Person p2 = Person(15);
+    Person p3 = Person(p2);
+
+    // 隐式转换法
+    Person p4 = 20; // Person p4 = Person(20)
+    Person p5 = p4; // Person p5 = Person(p4)
+
+    // 不能利用拷贝构造函数 初始化匿名对象，否则编译器会认为是对象声明
+    // Person p6(p5);
+}
+
+int main()
+{
+    std::cout << "test01 : " << std::endl;
+    test01();
+    std::cout << "test02 : " << std::endl;
+    test02();
+    return 0;
+}
+```
+
+#### 拷贝构造函数调用时机
+C++中拷贝构造函数调用的时机通常有三种情况：  
+- 使用一个已经创建完毕的对象来初始化一个新的对象
+- 值传递的方式给函数参数传值
+- 以值方式返回局部对象
+
+```cpp
+#include <iostream>
+#include <string>
+
+#ifndef TEST_H
+#define TEST_H
+
+class Person {
+public:
+    Person() {
+        std::cout << " 无参数构造函数 " << std::endl;
+        mAge = 0;
+    }
+
+    Person(int num) {
+        mAge = num;
+        std::cout << " 有参数构造函数 " << std::endl;
+    }
+
+    Person(const Person& p) {
+        mAge = p.mAge;
+        std::cout << " 拷贝构造函数 " << std::endl;
+    }
+    
+    ~Person() {
+        std::cout << " 析构函数 " << std::endl;
+    }
+
+public:
+    int32_t mAge;
+};
+
+#endif // TEST_H
+```
+```cpp
+#include "test.h"
+
+// 使用一个已经创建完毕的对象来初始化一个新对象
+void Test01()
+{
+    Person man(100);
+    Person newMan(man); // 调用拷贝构造函数
+    Person newMan2 = man; // 拷贝构造
+}
+
+// 值传递的方式给函数传参数
+void DoWork(Person p1) {};
+void Test02()
+{   
+    Person p;
+    DoWork(p);
+}
+
+// 以值的方式返回局部变量
+Person DoWork2()
+{
+    Person p1;
+    std::cout << (int *)&p1 << std::endl;
+    return p1;
+}
+
+void Test03()
+{
+    Person p = DoWork2();
+    std::cout << (int *)&p << std::endl;
+}
+
+int main()
+{
+    std::cout << "Test01 : " << std::endl;
+    Test01();
+    std::cout << "Test02 : " << std::endl;
+    Test02();
+    std::cout << "Test03 : " << std::endl;
+    Test03();
+    return 0;
+}
+```
+
+#### 构造函数调用规则

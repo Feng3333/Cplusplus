@@ -324,3 +324,67 @@ int main()
 }
 ```
 ### 深拷贝和浅拷贝
+- 浅拷贝：  
+  简单的赋值拷贝操作
+- 深拷贝：  
+  在堆区重新申请空间，进行拷贝操作
+  
+代码示例：
+```cpp
+#include <iostream>
+#include <string>
+
+#ifndef TEST_H
+#define TEST_H
+
+class Person {
+public:
+    Person() {
+        std::cout << " 无参数构造函数 " << std::endl;
+    }
+
+    Person(int num, int height) {
+        std::cout << " 有参数构造函数 " << std::endl;
+        mAge = num;
+        mHeight = new int(height);
+    }
+
+    Person(const Person& p) {
+        std::cout << " 拷贝构造函数 " << std::endl;
+        mAge = p.mAge;
+        // 如果不利用深拷贝在堆区创建新内存，会导致浅拷贝带来的重复释放堆区问题
+        mHeight = new int(*p.mHeight);
+    }
+    
+    ~Person() {
+        std::cout << " 析构函数 " << std::endl;
+        if (mHeight != nullptr) {
+            delete mHeight;
+        }
+    }
+
+public:
+    int32_t mAge;
+    int32_t* mHeight;
+};
+
+#endif // TEST_H
+```
+```cpp
+#include "test.h"
+
+void Test_1()
+{
+    Person p1(18, 175);
+    Person p2(p1); 
+    std::cout << "p1's age is : " << p1.mAge << " height : " << *p1.mHeight << std::endl;
+    std::cout << "p2's age is : " << p2.mAge << " height : " << *p2.mHeight << std::endl;
+}
+
+int main()
+{
+    std::cout << "Test_1 : " << std::endl;
+    Test_1();
+    return 0;
+}
+```

@@ -8,6 +8,7 @@
    - [拷贝构造函数调用时机](#拷贝构造函数调用时机)
    - [构造函数调用规则](#构造函数调用规则)
    - [深拷贝和浅拷贝](#深拷贝和浅拷贝)
+   - [初始化列表](#初始化列表)
 
 ## 1. 基本介绍
 C++中使用class关键字来创建一个新的对象:
@@ -387,4 +388,48 @@ int main()
     Test_1();
     return 0;
 }
+```
+
+### 初始化列表
+作用：C++提供了初始化列表语法，用来初始化属性  
+语法：  
+```
+构造函数() : 属性1(val_1), 属性2(val_2), 属性3(val_3)... {}
+```
+
+简单代码示例：  
+```c++
+#include <iostream>
+#include <string>
+
+#ifndef TEST_H
+#define TEST_H
+
+class Person {
+public:
+    Person(int a, int b, int c) : m_a(a), m_b(b), m_c(c) {};
+    void Print() {
+        std::cout << "m_a : " << m_a << std::endl; 
+        std::cout << "m_b : " << m_b << std::endl; 
+        std::cout << "m_c : " << m_c << std::endl; 
+    };
+
+public:
+    int m_a;
+    int m_b;
+    int m_c;
+};
+
+#endif // TEST_H
+```
+```c++
+#include "test.h"
+
+int main()
+{
+    Person p(1, 2, 3);
+    p.Print();
+    return 0;
+}
+
 ```

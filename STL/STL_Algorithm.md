@@ -1,9 +1,20 @@
 # C++ STL中的算法总结
-## 目录
-  - [sort()](#sort)
-  - [stable_sort()](#stable_sort)
+# 目录
+ - [遍历](#遍历)
+ - [排序](#排序)
+   - [sort()](#sort)
+   - [stable_sort()](#stable_sort)
 
-## sort()
+
+# 遍历
+## for_each
+遍历容器
+```
+for_each(iterator begin, iterator end, _func);
+```
+
+# 排序
+### sort()
 包含的头文件：
 ```cpp
 #include <algorithm>
@@ -17,7 +28,7 @@
 - 2. 如果对容器中指定区域的元素做默认升序排序，则元素类型必须支持 < 小于运算符；同样，如果选用标准库提供的其它排序规则，元素类型也必须支持该规则底层实现所用的比较运算符 
 - 3. sort() 函数在实现排序时，需要交换容器中元素的存储位置。这种情况下，如果容器中存储的是自定义的类对象，则该类的内部必须提供移动构造函数和移动赋值运算符。
 
-## stable_sort()
+### stable_sort()
 包含的头文件：
 ```cpp
 #include <algorithm>

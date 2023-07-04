@@ -8,3 +8,9 @@ gtest是Google开源的C++单元测试框架Google Test
 4. 提供了丰富的命令行参数对案例运行进行一系列的设置
 
 # 目录
+
+# git googletest
+```
+git clone https://github.com/google/googletest.git
+```
+git下来后是否需要重新编译视情况决定

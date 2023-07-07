@@ -13,4 +13,5 @@ gtest是Google开源的C++单元测试框架Google Test
 ```
 git clone https://github.com/google/googletest.git
 ```
-git下来后是否需要重新编译视情况决定
+git下来后是否需要重新编译视情况决定  
+- 示例代码(gtest_demo)需要在gtest_demo目录下执行上述代码,添加goolgetest，然后正常编译(IDE为是linux下的vscode)即可；

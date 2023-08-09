@@ -1,32 +1,34 @@
-#include <iostream>
-#include <map>
+#include "table_driver.h"
 
-class FunMap {
-public:
-    
-    int func1(int a, int b)
-    {
-        return a - b;
-    }
+namespace TableDriver {
 
-    int func2(int a, int b) 
-    {
-        return a + b;
-    }
-
-    typedef int(FunMap::*FUN)(int a, int b);
-    std::map<std::string, FUN> map = {
-        {"+", &FunMap::func1},
-        {"-", &FunMap::func2},
-    };
-};
-
-int main() {
-    FunMap *m = new FunMap();
-    int a = 10, b = 5;
-    std::string str("-");
-    FunMap::FUN f = m->map[str];
-    int ans = (m->*f)(a, b);
-    std::cout << ans;
-    return 0;
+int CalcOfInt::AddNums(int a, int b)
+{
+    return a + b;
 }
+
+int CalcOfInt::MinusNums(int a, int b)
+{
+    return a - b;
+}
+
+int CalcOfInt::MultNums(int a, int b)
+{
+    return a * b;
+}
+
+int CalcOfInt::DivideNums(int a, int b)
+{
+    if (b == 0) {
+        return 0;
+    }
+    return a / b;
+}
+
+int CalcOfInt::CalcNums(const std::string& opt, int a, int b)
+{
+    CalcOfInt::FuncPtr funcPtr = this->calcFuncs_[opt];
+    return (this->*funcPtr)(a, b);
+}
+
+} // namespace TableDriver

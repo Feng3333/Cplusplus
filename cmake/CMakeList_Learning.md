@@ -4,6 +4,7 @@
 - [1. 设定需要的最低版本的CMake](#1-设定需要的最低版本的cmake)
 - [2. 指定cmake工程的名字](#2-指定cmake工程的名字)
 - [3. add_library()](#3-add_library)
+- [4. add_executable()](#4-add_executable)
 
 ## 1. 设定需要的最低版本的CMake
 ```
@@ -98,3 +99,53 @@ add_library(<name> <STATIC|SHARED|MODULE|UNKNOWN> IMPORTED [GLOBAL])
 add_library(<name> ALIAS <target>)
 ```
 为给定library添加一个别名，后续可使用<name>来代替<target>
+
+
+## 4. add_executable()
+使用指定的源文件创建出一个可执行文件
+
+### 4.1 普通可执行文件
+```
+add_executable(<name> [WIN32] [MACOSX_BUNDLE]
+                [EXCLUDE_FROM_ALL]
+                [source1] [source2 ...])
+```
+添加一个可执行文件目标，此目标:  
+1. 由source列出的文件构建而来
+2. 名字为name
+
+命令参数：  
+- name: 生成可执行文件的名字，必须在工程内全局唯一
+- WIN32: 有此参数时，WIN32_EXECUTABLE属性会被置位true，此时在windows环境下的创建的可执行文件将以WinMain函数代替main函数作为程序入口，构建而成的可执行文件为GUI应用程序而不是控制台应用程序；
+- MACOSX_BUNDLE: 有此参数时，MACOSX_BUNDLE属性会被置位true，此时在macOS或者iOS上构建可执行文件目标时，目标会称为一个从Finder启动的GUI可执行程序；
+- EXCLUDE_FROM_ALL: 有此参数时，此目标就会被排除在all target列表之外，即在执行默认的make时，不会构造此目标，需要构造此目标的时候，需要手动构建，如：
+ ```
+add_executable(test EXCLUDE_FROM_ALL text.cpp)
+
+make test
+```
+- 可以使用target_sources()继续为构建可执行文件目标添加源文件，但是target_sources()指令必须在 add_executable 或 add_library 之后调用.
+ 
+示例程序(普通)：
+```
+cmake_minimum_required(VERSION 3.5)
+
+project(hello_cmake)
+
+add_execuable(hello_cmake main.cpp)
+```
+
+### 4.2 导入的可执行文件
+将工程外部的可执行目标文件导入进来，不会有任何构建可执行目标文件的动作发生；  
+```
+add_executable(<name> IMPORTED [GLOBAL])
+```
+- name: 导入可执行文件的名字
+- IMPORTED: 导入的目标文件需指定IMPORTED属性，IMPORTED属性指定后，目标文件的属性IMPORTED被置位true，在工程内构建生成的可执行文件的IMPORTED属性会被置位false；
+
+### 4.3 别名可执行文件
+为目标文件取一个别名，一遍后续继续使用
+```
+add_executable(<name> ALIAS <target>)
+```
+为目标创建别名后，可以使用别名读取目标的属性，但不能修改目标属性. 

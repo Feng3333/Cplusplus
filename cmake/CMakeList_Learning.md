@@ -1,7 +1,9 @@
-# CmakeList编写介绍
-
+# CmakeList编写介绍  
 ## 目录
+
 - [1. 设定需要的最低版本的CMake](#1-设定需要的最低版本的cmake)
+- [2. 指定cmake工程的名字](#2-指定cmake工程的名字)
+- [3. add_library()](#3-add_library)
 
 ## 1. 设定需要的最低版本的CMake
 ```
@@ -14,7 +16,7 @@ cmake_minimum_required(VERSION <min>[...<policy_max>] [FATAL_ERROE])
 cmake_minimum_required(VERSION 3.16)
 ```
 
-## 指定cmake工程的名字
+## 2. 指定cmake工程的名字
 ```
 project(<PROJECT-NAME> [<language-name>...])
 ```
@@ -32,3 +34,7 @@ VERSION      : 可选，工程版本号，有主版本号，次版本号，补�
 DESCRIPTION  : 可选，工程简单的描述  
 HOMEPAGE_URL : 可选，工程主页url  
 LANGUAGES    : 可选，工程使用的语言，默认为C或者CXX
+
+## 3. add_library()
+
+

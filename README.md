@@ -1,4 +1,18 @@
 # Cplusplus------->简称 C艹
+
+## 提交描述规则
+```
+【FE/RR】FE202311061429
+【Modification】description
+【Modifier】Feng3333
+【Reviewer】Feng3333
+```
+【FE/RR】 FE或者RR加时间年月日时分
+【Modification】修改或更新内容简介
+【Modifier】提交者
+【Reviewer】....
+
+
 ## C++ 从入门到入睡
 真.随便记记  
 我承认我有点东西，但是不多;   

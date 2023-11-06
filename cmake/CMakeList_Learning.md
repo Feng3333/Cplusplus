@@ -68,3 +68,33 @@ add_executable(test_app main.cpp $<TRAGET_OBJECTS:test_library>)
 add_library(anotherlib STATIC other.cpp $<TRAGET_OBJECTS:test_library>)
 ```
 
+### 3.3 接口库
+```
+add_library(<name> INTERFACE [IMPORTED [GLOBAL]])
+```
+生成一个接口库，这类库不编译任何文件，也不在磁盘上产生库文件。它有一些属性设置被设置，并且能够被安装和导出。  
+通常使用以下命令在接口目标上填充属性: 
+```
+set_property()
+target_link_library(INTERFACE)
+target_link_options(INTERFACE)
+target_include_directions(INTERFACE)
+target_compile_options(INTERFACE)
+target_compile_definitions(INTERFACE)
+target_sources(INTERFACE)
+```
+然后像其他目标一样被用作参数给target_link_libraries()
+
+### 3.4 导入的库
+```
+add_library(<name> <STATIC|SHARED|MODULE|UNKNOWN> IMPORTED [GLOBAL])
+```
+用来导入已经存在的库，CMake也不会添加任何编译规则给它；  
+此类库的标志就是有IMPORTED属性，导入的库的作用域为创建它的目录及更下级目录。但是如果有GLOBAL属性，则作用域被拓展到全工程；  
+导入的库类型必须是 STATIC| SHARED | MODULE| UNKNOWN 中的一种，对于UNKNOWN类型，不需要知道类型就可以使用的从工程外部引入的一个库，使用IMPORTED_LOCATION属性确定库文件在磁盘上的完整路径。  
+
+### 3.5 别名库
+```
+add_library(<name> ALIAS <target>)
+```
+为给定library添加一个别名，后续可使用<name>来代替<target>

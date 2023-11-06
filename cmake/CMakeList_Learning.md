@@ -35,6 +35,36 @@ DESCRIPTION  : 可选，工程简单的描述
 HOMEPAGE_URL : 可选，工程主页url  
 LANGUAGES    : 可选，工程使用的语言，默认为C或者CXX
 
-## 3. add_library()
 
+## 3. add_library()
+add_library命令用来使用指定的源文件向工程中添加一个目录库，主要有以下形式：  
+
+### 3.1 普通库
+```
+add_library(<name> [STATIC | SHARED | MODULE]
+            [EXCLUDE_FROM_ALL]
+            [<source>...])
+```
+添加一个从source列表列出的文件构建而来的目标明为 name 的库，name必须全局唯一 ；  
+构建库的源文件可以直接指定，也可以后续使用target_sources()指定；  
+STATIC(静态库) SHARED(动态库) MODULE(模块库) 用来指定库的类型， 使用STATIC(静态库)构建生成静态库(name.a),使用SHARED(动态库)构建生成动态库(name.so)；  
+
+代码示例：
+```
+add_library(hello_library STATIC src/Hello.cpp)
+```
+
+### 3.2 对象库
+```
+add_library(<name> OBJECT [<source>...])
+```
+这种形式类型固定为OBJECT,以这种方式，只编译source列表的文件，但不将生成的目标文件打包或者链接为库，而是在其他add_library()或者add_executable()生成目标的时候，可以使用形如$<TRAGET_OBJECTS:objlib>的表达式将对象库作为源引入。  
+
+示例代码：
+```
+add_library(test_library OBJECT a.cpp b.cpp c.cpp)
+
+add_executable(test_app main.cpp $<TRAGET_OBJECTS:test_library>)
+add_library(anotherlib STATIC other.cpp $<TRAGET_OBJECTS:test_library>)
+```
 

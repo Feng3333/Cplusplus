@@ -5,6 +5,8 @@
 - [2. 指定cmake工程的名字](#2-指定cmake工程的名字)
 - [3. add_library()](#3-add_library)
 - [4. add_executable()](#4-add_executable)
+- [5. target_include_directories()](#5-target_include_directories)
+- [6. include_directories()](#6-include_directories)
 
 ## 1. 设定需要的最低版本的CMake
 ```
@@ -149,3 +151,70 @@ add_executable(<name> IMPORTED [GLOBAL])
 add_executable(<name> ALIAS <target>)
 ```
 为目标创建别名后，可以使用别名读取目标的属性，但不能修改目标属性. 
+
+
+## 5. target_include_directories()
+```
+target_include_directories(<target> [SYSTEM] [AFTER |  BEFORE]6. include_directories()
+                           <INTERFACE|PUBLIC|PRIVATE> [items1...]
+                           [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...])
+```
+该命令用于为指定的目标 target 添加包含目录 include directories 。指定编译目标时需要搜索头文件的路径，以确保编译器可以找到所需的头文件，
+这对于创建CMake项目中的库和可执行文件非常有用，因为它们可能依赖于其他模块或库的头文件。  
+参数说明：  
+- target: 要添加包含目录的目标名称
+- SYSTEM: 可选参数，指定被包含的目录是系统目录，这会告诉编译器将这些目录视为系统的标准头文件目录。
+- BEFORE: 可选参数，指定将包含目录添加到已有的包含目录之前，而不是默认的添加到后面。
+- INTERFACE|PUBLIC|PRIVATE: 指定包含目录的可见性级别
+  INTERFACE: 表示包含目录将应用于目标及其使用该目标的其他目标；
+  PUBLIC: 表示包含目录将应用于目标本身和使用该目标的其他目标
+  PRIVATE: 表示包含目录仅应用于目标本身；
+- items: 指定要添加的包含目录路径，可以是目录名、绝对路径或者相对路径。
+
+代码示例：
+```
+# 使用绝对路径
+target_include_directories(target_name PRIVATE /path/to/directory)
+```
+这将为指定的目标 target_name 添加一个私有的包含目录，即只有该目标及其依赖项可以访问这个目录。
+
+```
+# 使用相对路径
+target_include_directories(target_name PRIVATE relative/path/to/directory)
+```
+这将使用相对于当前CMakeLists.txt文件所在路径的相对路径来指定包含目录
+
+```
+# 还可以一次添加多个查找目录
+target_include_directories(target_name PRIVATE
+                           directory1
+                           directory2
+                           ...
+)
+```
+
+## 6. include_directories()
+```
+include_directories([AFTER|BEFORE] [SYSTEM] dir1 [dir2 ...])
+```
+include_directories用于指定包含头文件目录。include_directories函数允许在CMakeLists.txt文件中指定项目的头文件目录，以便在编译过程中能够正确的找到包含目录中的头文件。  
+参数说明：  
+- AFTER|BEFORE: 可选参数，用于指定包含目录的添加顺序，如果使用AFTER修饰符，那么添加的目录将会放到已有包含目录的后面，使用BEFORE修饰符则会把添加的目录将放到已有包含目录的前面，默认为AFTER；
+- SYSTEM: 可选的修饰符，用于指定所包含的目录是系统拒接的目录。当使用SYSTEM修饰符时，编译器会将这些目录视为系统级别的头文件目录，这意味着编译器不会产生关于这些目录的警告信息。
+
+代码示例：
+```
+include_directories(
+        ${CMAKE_CURRENT_SOURCE_DIR}/
+        ${CMAKE_CURRENT_SOURCE_DIR}/dir1/
+        directory1
+        directory2
+        ...
+)
+```
+
+注意事项：
+- include_directories命令应该在 add_exectable 或 add_library 之前使用，以确保编译器在构建过程中能够找到所需的头文件  
+- include_directories命令仅仅告诉编译器在哪些目录中查找头文件，并不会自动包含这些头文件。要包含头文件，需要使用#include预处理指令在代码中显式包含。  
+- 尽量避免使用include_directories命令的绝对路径。推荐使用相对于CMakeLists.txt文件的相对路径，以增加项目的可移植性；  
+- 在使用include_directories命令时，应确保指定的目录中包含正确的头文件。否则，编译器可能无法找到所需的头文件，导致编译错误。  

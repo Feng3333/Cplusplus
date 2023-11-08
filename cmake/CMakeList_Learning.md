@@ -7,6 +7,7 @@
 - [4. add_executable()](#4-add_executable)
 - [5. target_include_directories()](#5-target_include_directories)
 - [6. include_directories()](#6-include_directories)
+- [7. target_link_libraries()](#7-target_link_libraries)
 
 ## 1. 设定需要的最低版本的CMake
 ```
@@ -218,3 +219,44 @@ include_directories(
 - include_directories命令仅仅告诉编译器在哪些目录中查找头文件，并不会自动包含这些头文件。要包含头文件，需要使用#include预处理指令在代码中显式包含。  
 - 尽量避免使用include_directories命令的绝对路径。推荐使用相对于CMakeLists.txt文件的相对路径，以增加项目的可移植性；  
 - 在使用include_directories命令时，应确保指定的目录中包含正确的头文件。否则，编译器可能无法找到所需的头文件，导致编译错误。  
+
+
+## 7. target_link_libraries()
+```
+target_link_libraries(<target> ... <item>... ...)
+```
+该命令用于将目标与所需的库进行链接，它用于指定一个目标(例如可执行文件或库)需要依赖的其他库，以便在构建过程中正确地链接这些库。该命令有多种使用方式。
+
+参数说明：  
+- target: 要链接库的目标
+  target必须是由 add_exectable 或 add_library 等命令创建的，并且不能是ALIAS目标；  
+  对同一target的重复调用按照调用的顺序追加项；  
+- item: item可以是:  
+  一个库目标的名称  
+  库文件的完整路径  
+  普通的库名称  
+  链接标志  
+  一个生成器表达式  
+  构建配置的关键字
+
+使用示例：  
+```
+target_link_libraries(<target>
+                      <PRIVATE|PUBLIC|INTERFACE> <item>...
+                      [<PRIVATE|PUBLIC|INTERFACE> <item>...]...)
+```
+
+
+假设有两个目标: my_app 和 my_library, 目前想将 my_library 链接到 my_app中:  
+```
+# 将 my_library 链接到 my_app 中
+add_library(my_library STATIC my_library.cpp)
+add_executable(my_app main.cpp)
+target_link_libraries(my_app my_library)
+
+# 先将other_library链接到my_library上
+add_library(other_library STATIC other_library.cpp)
+target_link_libraries(my_library other_library)
+# 最后构建my_app时，my_app会链接到other_library 和 my_library，并将他们一起包含在最终的可执行文件中
+target_link_libraries(my_app my_library)
+```

@@ -8,6 +8,7 @@
 - [5. target_include_directories()](#5-target_include_directories)
 - [6. include_directories()](#6-include_directories)
 - [7. target_link_libraries()](#7-target_link_libraries)
+- [8. set()](#8-set)
 
 ## 1. 设定需要的最低版本的CMake
 ```
@@ -259,4 +260,92 @@ add_library(other_library STATIC other_library.cpp)
 target_link_libraries(my_library other_library)
 # 最后构建my_app时，my_app会链接到other_library 和 my_library，并将他们一起包含在最终的可执行文件中
 target_link_libraries(my_app my_library)
+```
+
+## 8. set()
+```
+set(<variable> <value>... [PARENT_SCOPE])
+```
+在CMake中，set用于设置变量的值。这个变量可以为普通变量、Cache、或者是环境变量；  
+如果提供了一个或多个 \<value> 参数，则将 \<variable> 设置为给定的值.  
+如果没有提供 \<value> 参数，则取消设置 \<variable>，将其值设置为无，相当于unset  
+
+参数说明：  
+- variable: 要被赋值的变量
+- value: 要付给变量的值
+- PARENT_SCOPE: 是一个修饰符，用于指定变量的作用域作为父级作用域。
+
+使用示例:  
+```
+function(set_variable)
+	set(variable "Hello, World!" PARENT_SCOPE)
+endfunction()
+
+set_variable()
+# 输出: Hello, World!
+message("${variable}")
+```
+在上述示例中，set_variable()函数内部使用了set命令设置了变量variable的值，并使用PARENT_SCOPE修饰符将其作用域提升到调用函数的作用域.   
+因此，message命令在函数外部打印出了变量variable的值。  
+- 需要注意的是：PARENT_SCOPE修饰符只能将变量的作用域提升到直接的父级作用域，无法跳过中间的作用域.
+  如果要将变量的作用域提升到更高层次的作用域，需要在对应的父级作用域中再次使用set命令.
+
+#### 设置Cache变量
+set命令可以用于设置缓存变量(cache entry), 并提供用户可设置的值.
+```
+set(<variable> <value>... CACHE <type> <docstring> [FORCE])
+```
+参数说明:  
+- <variable>: 要设置的缓存变量的名称  
+- <value>: 要为缓存变量设置的值(可以有多个)
+- CACHE: 指定该变量是一个缓存变量
+- <type>: 变量的类型，可以是\[BOOL, FILEPATH, PATH, STRING, INTERNAL]
+- FORCE: 可选项，用于强制覆盖现有的缓存变量。缓存默认是不覆盖的，如果在调用之前缓存项不存在，或者给出了FORCE选项，那么缓存项将被设置为给定的值.
+
+使用示例：
+```
+cmake_minimum_required(VERSION 3.5)
+project(hello_library)
+
+set(MY_VARIABLE "Hello, World!" CACHE STRING "A greeting message" FORCE)
+message("${MY_VARIABLE}")  # 输出 Hello, World!
+
+set(MY_VARIABLE "Good Morning" CACHE STRING "A greeting message")
+message("${MY_VARIABLE}")  # 输出 Hello, World! 因为不加FORCE默认不覆盖
+
+set(MY_VARIABLE "Good Morning" CACHE STRING "A greeting message" FORCE)
+message("${MY_VARIABLE}")  # 输出 Good Morning 加了FORCE会强制覆盖
+```
+
+#### 设置系统变量
+设置环境变量的值，执行这个命令时，它只会对当前的CMake进程中的环境变量进行修改;  
+它不会影响调用CMake的进程的环境变量，这个系统环境，或者后续构建或测试过程中的环境变量.  
+```
+set(ENV{variable} [<value>])
+```
+参数说明:  
+- variable: 环境变量的名称   
+- value: 要设置的值, 如果没有提供value或者value为空字符串, 该命令将清楚环境变量的任何现有值
+- 在set(ENV{} [])命令之后提供的任何参数都会被忽略，如果发现额外的参数，将会发出警告.  
+
+使用示例:  
+```
+cmake_minimum_required(VERSION 3.5)
+project(setCommand)
+
+# 设置一个名为 MY_VARIABLE 的环境变量，其值为 Hello World
+set(ENV{MY_VARIABLE} "Hello World")
+message(">>> MY_VARIABLE: $ENV{MY_VARIABLE}")
+
+# 清除名为 MY_VARIABLE 环境变量的值
+set(ENV{MY_VARIABLE} )
+message(">>> MY_VARIABLE: $ENV{MY_VARIABLE}")
+
+# 设置一个名为 NUM_THREADS 的环境变量，其值为4
+set(ENV{NUM_THREADS} 4)
+message(">>> NUM_THREADS: $ENV{NUM_THREADS}")
+
+# 清除名为 NUM_THREADS 环境变量的值
+set(ENV{NUM_THREADS} )
+message(">>> NUM_THREADS: $ENV{NUM_THREADS}")
 ```

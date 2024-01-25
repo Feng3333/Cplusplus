@@ -21,3 +21,6 @@ bitset<n> num(x)  // 将数字x转换为二进制保存到num中，num有n位，
 
 \_\_builtin\_popcount为C++内置函数，无需添加头文件;  
 作用：可以计算一个数二进制中1的个数
+```cpp
+int ans = __builtin_popcount(5);    // ans = 2
+```

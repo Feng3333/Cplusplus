@@ -1,4 +1,4 @@
-![image](https://github.com/Feng3333/Cplusplus/assets/82488197/3ae62a49-ef24-4471-8f56-65a8260b14dd)# 基础数据类型
+# 基础数据类型
 ## 目录
 - [C++命名规则](#c命名规则)
 - [简单变量](#简单变量)

@@ -1,4 +1,4 @@
-# 基础数据类型
+![image](https://github.com/Feng3333/Cplusplus/assets/82488197/3ae62a49-ef24-4471-8f56-65a8260b14dd)# 基础数据类型
 ## 目录
 - [C++命名规则](#c命名规则)
 - [简单变量](#简单变量)
@@ -117,6 +117,10 @@ printf(" %f" ,num);
 2.34E20F //float类型
 1.342E28 //默认double类型
 2.3L //long double类型
+
+// 编译器可取到的double类型的最小值：
+double minDouble = std::numeric_limits<double>::epsilon();
+
 ```
 
 #### 浮点数的优缺点

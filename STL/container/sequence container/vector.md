@@ -11,6 +11,7 @@
 - [4. vector中的sort和迭代器](#4-vector中的sort和迭代器)
   - [4.1 sort排序](#41-sort排序)
   - [4.2 迭代器](#42-迭代器)
+- [5. vector中的resize使用方法](#5-vector中的resize使用方法)
 
 ## 1 实现原理
 C++中的vector本质上是一个动态数组（vector的底层实现原理为一维数组），它的元素是连续存储的，这意味着不仅可以通过迭代器访问元素，还可以使用指向元素的常规指针来对其进行访问。  
@@ -442,4 +443,46 @@ result :
 ```
 9 19 2 5 4 6 
 19 9 6 5 4 2 
+```
+
+## 5 vector中的resize使用方法
+C++ vector resize() 函数用于改变 vector 的大小。它接受一个参数 n，表示 vector 的新大小。如果新大小小于当前大小，vector 将被截断，如果新大小大于当前大小，则新元素将被插入 vector 的末尾   
+
+resize() 函数的语法如下：
+```cpp
+void resize(size_type n, value_type val = value_type());
+```
+其中，n 表示新的 vector 大小，val 表示新元素的默认值。如果不指定 val，则新元素将使用默认构造函数进行初始化。  
+
+代码示例:  
+```cpp
+#include <iostream>
+#include <vector>
+
+int main() {
+    std::vector<int> v{1, 2, 3, 4, 5};
+
+    std::cout << "Before resize: ";
+    for (auto i : v) {
+        std::cout << i << " ";
+    }
+    std::cout << endl;
+
+    v.resize(8, 0);
+
+    std::cout << "After resize: ";
+    for (auto i : v) {
+        std::cout << i << " ";
+    }
+    std::cout << endl;
+
+    return 0;
+}
+```
+
+输出结果为：
+
+```
+Before resize: 1 2 3 4 5 
+After resize: 1 2 3 4 5 0 0 0 
 ```

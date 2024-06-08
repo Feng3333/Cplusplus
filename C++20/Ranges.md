@@ -149,3 +149,38 @@ int main() {
     return 0;
 }
 ```
+
+### 7.填充
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <ranges>
+
+int main() {
+    std::vector<int> vec(10); // 创建一个大小为 10 的 vector
+    std::ranges::fill(vec, 42); // 将 vec 的所有元素设置为 42
+
+    for (const auto& elem : vec) {
+        std::cout << elem << " ";
+    }
+
+    // 填充一个数组
+    int arr[5]; // 创建一个大小为 5 的数组
+    std::ranges::fill(arr, -1); // 将数组的所有元素设置为 -1
+
+    for (const auto& elem : arr) {
+        std::cout << elem << " ";
+    }
+
+    // 填充部分范围
+    std::vector<int> vec1(10); // 创建一个大小为 10 的 vector
+    std::ranges::fill(vec1.begin() + 2, vec1.begin() + 7, 99); // 将部分元素设置为 99
+
+    for (const auto& elem : vec1) {
+        std::cout << elem << " ";
+    }
+
+    return 0;
+}
+```
